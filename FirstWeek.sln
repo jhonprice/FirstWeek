@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RayCameraAndBackGround", "R
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SurfaceNormalAndCleanCode", "SurfaceNormalAndCleanCode\SurfaceNormalAndCleanCode.vcxproj", "{6019F037-BAE0-49EE-8597-AF257D5520A2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MultipleObjectAndCodeClean", "MultipleObjectAndCodeClean\MultipleObjectAndCodeClean.vcxproj", "{90350B91-4106-4809-A833-259C55507F5D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{6019F037-BAE0-49EE-8597-AF257D5520A2}.Release|x64.Build.0 = Release|x64
 		{6019F037-BAE0-49EE-8597-AF257D5520A2}.Release|x86.ActiveCfg = Release|Win32
 		{6019F037-BAE0-49EE-8597-AF257D5520A2}.Release|x86.Build.0 = Release|Win32
+		{90350B91-4106-4809-A833-259C55507F5D}.Debug|x64.ActiveCfg = Debug|x64
+		{90350B91-4106-4809-A833-259C55507F5D}.Debug|x64.Build.0 = Debug|x64
+		{90350B91-4106-4809-A833-259C55507F5D}.Debug|x86.ActiveCfg = Debug|Win32
+		{90350B91-4106-4809-A833-259C55507F5D}.Debug|x86.Build.0 = Debug|Win32
+		{90350B91-4106-4809-A833-259C55507F5D}.Release|x64.ActiveCfg = Release|x64
+		{90350B91-4106-4809-A833-259C55507F5D}.Release|x64.Build.0 = Release|x64
+		{90350B91-4106-4809-A833-259C55507F5D}.Release|x86.ActiveCfg = Release|Win32
+		{90350B91-4106-4809-A833-259C55507F5D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
