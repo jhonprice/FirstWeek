@@ -1,10 +1,11 @@
 #pragma once
 #include<cmath>
 #include<iostream>
-
+#include "../MultipleObjectAndCodeClean/rtweekend.h"
 using std::sqrt;
 
 //<<3D向量的定义>>
+//+=<<产生随机的3D向量: 漫反射采样预选点>>
 class vec3 {
 public:
 	//<<初始化部分>>
@@ -48,7 +49,16 @@ public:
     }
 #pragma endregion
 
-    
+//<<产生随机的3D向量>>
+#pragma region RandomVec
+    inline static vec3 random() {
+        return vec3(random_double(), random_double(), random_double());
+    }
+    inline static vec3 random(double min, double max) {
+        return vec3(random_double(min, max), random_double(min, max), random_double(min, max));
+    }
+#pragma endregion
+
 
 public:
 	double e[3];
@@ -106,4 +116,11 @@ inline vec3 unit_vector(vec3 v) {
 }
 #pragma endregion
 
-
+//<<随机出一个位于单位圆之内的向量>>
+vec3 random_in_unit_sphere() {
+    while (true) {
+        auto p = vec3::random(-1, 1);
+        if (p.length_squared() >= 1) continue;
+        return p;
+    }
+}

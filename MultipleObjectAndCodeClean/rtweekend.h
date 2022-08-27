@@ -30,9 +30,9 @@ inline double clamp(double x, double min, double max) {
 
 
 // Common Headers
-#include "../Starter/color.h"
-#include "../Starter/vec3.h"
-#include "../RayCameraAndBackGround/ray.h"
+//#include "../Starter/color.h"
+//#include "../Starter/vec3.h"
+//#include "../RayCameraAndBackGround/ray.h"
 
 //<<随机数部分>>
 #pragma region RandomPart
