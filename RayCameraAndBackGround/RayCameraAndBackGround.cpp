@@ -12,6 +12,10 @@ const auto aspect_ratio = 16.0 / 9.0;
 //<<光线投射，构建背景>> - 1
 color ray_color(const ray& r);
 
+//<<光线投射与球体相交>> - 2
+bool hit_sphere(const point3& center, double radius, const ray& r);
+
+
 int main()
 {
 //<<根据宽高比设置图片的高度与宽度>>
@@ -54,14 +58,39 @@ int main()
 }
 
 
-//1:<<光线投射，构建背景>>
+//1:<<光线投射，构建背景,击中球体>>
 /*
-*   理想结果：y轴从底下的白色到上面的蓝色渐变
+*   理想结果：y轴从底下的白色到上面的蓝色渐变，与球体相交部分是深蓝色
 */
 color ray_color(const ray& r)
 {
+//<<与球体相交>>
+#pragma region SpherePart
+    auto sphere_center = point3(0, 0, -1);
+    auto sphere_r = 0.5;
+    if (hit_sphere(sphere_center, sphere_r, r))
+        return color(0, 0, 1);
+#pragma endregion
+
+
+//<<构建背景>>
+#pragma region BackgroudColor
     vec3 unit_direction = unit_vector(r.direction());
     auto t = 0.5 * (unit_direction.y() + 1.0);
     return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
+#pragma endregion
 
+}
+
+
+
+//2:<<光线投射与球体相交:求解方程判别式>>
+bool hit_sphere(const point3& center, double radius, const ray& r)
+{
+    vec3 oc = r.origin() - center;
+    auto a = dot(r.direction(), r.direction());
+    auto b = 2.0 * dot(oc, r.direction());
+    auto c = dot(oc, oc) - radius * radius;
+    auto discriminant = b * b - 4 * a * c;
+    return (discriminant > 0);
 }
