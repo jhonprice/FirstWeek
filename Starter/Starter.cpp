@@ -39,9 +39,9 @@ void drawOnePPM() {
 			color pixel_color(r,g,b); //2
 			write_color(std::cout, pixel_color); //2
 			
-		}
-		std::cerr << "\nDone.\n";  //1
+		}	
 	}
+	std::cerr << "\nDone.\n";  //1
 #pragma endregion
 
 }
