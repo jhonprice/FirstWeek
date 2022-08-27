@@ -130,6 +130,8 @@
     <ClCompile Include="Antialiasing.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\MultipleObjectAndCodeClean\rtweekend.h" />
+    <ClInclude Include="..\Starter\color.h" />
     <ClInclude Include="camera.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
