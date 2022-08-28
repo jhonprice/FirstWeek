@@ -2,12 +2,15 @@
 
 #include "../RayCameraAndBackGround/ray.h"
 
+class material;
 
 //<<光线命中的记录>>
 //+=<<判断光线与表面的内外位置关系来确定法线朝向>>
+//+=<<材质与散射属性>> - 1
 struct hit_record {
     point3 p;
     vec3 normal;
+    shared_ptr<material> mat_ptr; // 1
     double t;
 
     bool front_face;
