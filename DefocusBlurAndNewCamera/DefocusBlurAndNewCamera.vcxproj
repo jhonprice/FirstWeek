@@ -129,6 +129,10 @@
   <ItemGroup>
     <ClCompile Include="DefocusBlurAndNewCamera.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Starter\vec3.h" />
+    <ClInclude Include="fullcamera.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
