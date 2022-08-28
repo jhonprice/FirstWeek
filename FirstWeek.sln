@@ -19,6 +19,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Metal", "Metal\Metal.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Dielectrics", "Dielectrics\Dielectrics.vcxproj", "{8B060F14-BF99-487A-AE7F-E30761F93003}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PositionableCamera", "PositionableCamera\PositionableCamera.vcxproj", "{F6013C57-6D53-49B5-B993-5B261C5341E4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PositionableCamera2", "PositionableCamera2\PositionableCamera2.vcxproj", "{CA7B8175-F52D-4D55-BA0C-36CB6EDAA3FC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DefocusBlurAndNewCamera", "DefocusBlurAndNewCamera\DefocusBlurAndNewCamera.vcxproj", "{EEE746C7-C251-46F1-AABC-397EB46B5C70}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -91,6 +97,30 @@ Global
 		{8B060F14-BF99-487A-AE7F-E30761F93003}.Release|x64.Build.0 = Release|x64
 		{8B060F14-BF99-487A-AE7F-E30761F93003}.Release|x86.ActiveCfg = Release|Win32
 		{8B060F14-BF99-487A-AE7F-E30761F93003}.Release|x86.Build.0 = Release|Win32
+		{F6013C57-6D53-49B5-B993-5B261C5341E4}.Debug|x64.ActiveCfg = Debug|x64
+		{F6013C57-6D53-49B5-B993-5B261C5341E4}.Debug|x64.Build.0 = Debug|x64
+		{F6013C57-6D53-49B5-B993-5B261C5341E4}.Debug|x86.ActiveCfg = Debug|Win32
+		{F6013C57-6D53-49B5-B993-5B261C5341E4}.Debug|x86.Build.0 = Debug|Win32
+		{F6013C57-6D53-49B5-B993-5B261C5341E4}.Release|x64.ActiveCfg = Release|x64
+		{F6013C57-6D53-49B5-B993-5B261C5341E4}.Release|x64.Build.0 = Release|x64
+		{F6013C57-6D53-49B5-B993-5B261C5341E4}.Release|x86.ActiveCfg = Release|Win32
+		{F6013C57-6D53-49B5-B993-5B261C5341E4}.Release|x86.Build.0 = Release|Win32
+		{CA7B8175-F52D-4D55-BA0C-36CB6EDAA3FC}.Debug|x64.ActiveCfg = Debug|x64
+		{CA7B8175-F52D-4D55-BA0C-36CB6EDAA3FC}.Debug|x64.Build.0 = Debug|x64
+		{CA7B8175-F52D-4D55-BA0C-36CB6EDAA3FC}.Debug|x86.ActiveCfg = Debug|Win32
+		{CA7B8175-F52D-4D55-BA0C-36CB6EDAA3FC}.Debug|x86.Build.0 = Debug|Win32
+		{CA7B8175-F52D-4D55-BA0C-36CB6EDAA3FC}.Release|x64.ActiveCfg = Release|x64
+		{CA7B8175-F52D-4D55-BA0C-36CB6EDAA3FC}.Release|x64.Build.0 = Release|x64
+		{CA7B8175-F52D-4D55-BA0C-36CB6EDAA3FC}.Release|x86.ActiveCfg = Release|Win32
+		{CA7B8175-F52D-4D55-BA0C-36CB6EDAA3FC}.Release|x86.Build.0 = Release|Win32
+		{EEE746C7-C251-46F1-AABC-397EB46B5C70}.Debug|x64.ActiveCfg = Debug|x64
+		{EEE746C7-C251-46F1-AABC-397EB46B5C70}.Debug|x64.Build.0 = Debug|x64
+		{EEE746C7-C251-46F1-AABC-397EB46B5C70}.Debug|x86.ActiveCfg = Debug|Win32
+		{EEE746C7-C251-46F1-AABC-397EB46B5C70}.Debug|x86.Build.0 = Debug|Win32
+		{EEE746C7-C251-46F1-AABC-397EB46B5C70}.Release|x64.ActiveCfg = Release|x64
+		{EEE746C7-C251-46F1-AABC-397EB46B5C70}.Release|x64.Build.0 = Release|x64
+		{EEE746C7-C251-46F1-AABC-397EB46B5C70}.Release|x86.ActiveCfg = Release|Win32
+		{EEE746C7-C251-46F1-AABC-397EB46B5C70}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
