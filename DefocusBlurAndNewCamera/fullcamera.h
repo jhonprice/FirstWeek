@@ -12,6 +12,9 @@ public:
         double aperture, //  光圈
         double focus_dist // 焦距（按比例放大
     ) {
+
+
+
         auto theta = degrees_to_radians(vfov);
         auto h = tan(theta / 2);
         auto viewport_height = 2.0 * h;
@@ -21,6 +24,12 @@ public:
         u = unit_vector(cross(vup, w));
         v = cross(w, u);
 
+
+        //对比
+        //origin = lookfrom;
+        //horizontal = viewport_width * u;
+        //vertical = viewport_height * v;
+        //lower_left_corner = origin - horizontal / 2 - vertical / 2 - w;
         origin = lookfrom;
         horizontal = focus_dist * viewport_width * u;
         vertical = focus_dist * viewport_height * v;
@@ -34,6 +43,8 @@ public:
         vec3 rd = lens_radius * random_in_unit_disk();
         vec3 offset = u * rd.x() + v * rd.y();
 
+        //对比
+        //return ray(origin, lower_left_corner + u * horizontal + v * vertical - origin);
         return ray(
             origin + offset,
             lower_left_corner + s * horizontal + t * vertical - origin - offset

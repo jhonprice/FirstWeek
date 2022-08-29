@@ -8,7 +8,9 @@
 class camera {
 public:
 #pragma region CameraInfo
-	camera() {
+//<<基本的视口设置>>
+	camera() 
+    {
 		//<<设置全局宽高比>>
 		const auto aspect_ratio = 16.0 / 9.0;
         //<<Camera相机视口参数设置>>
@@ -23,6 +25,7 @@ public:
 
 	}
 //<<调整视野>> - 1
+//视口不再固定，随着vfov视角和aspect_ratio的变化
     camera(
         double vfov, // vertical field-of-view in degrees
         double aspect_ratio

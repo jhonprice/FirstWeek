@@ -33,10 +33,12 @@ int main()
     const int max_depth = 50;
 #pragma endregion
 
-    //<<构建场景：初始化可命中对象列表>>
+//<<构建场景：初始化可命中对象列表>>
+#pragma region buildWorld
     hittable_list world;
     world.add(make_shared<sphere>(point3(0, 0, -1), 0.5));
     world.add(make_shared<sphere>(point3(0, -100.5, -1), 100));
+#pragma endregion
 
 
     //<<Camera相机视口参数设置>>
@@ -103,6 +105,7 @@ color ray_color(const ray& r, const hittable& world, int depth) {
         //1: point3 target = rec.p + rec.normal + random_in_unit_sphere(); 
         //2: point3 target = rec.p + rec.normal + random_unit_vector();// 1
         point3 target = rec.p + random_in_hemisphere(rec.normal); //3
+        //这里的0.5表示每次吸收50%的能量，根据漫反射物体的性质，最终显示出灰色
         return 0.5 * ray_color(ray(rec.p, target - rec.p), world, depth-1);
 #pragma endregion
     }

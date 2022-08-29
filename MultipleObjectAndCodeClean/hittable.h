@@ -10,10 +10,10 @@ class material;
 struct hit_record {
     point3 p;
     vec3 normal;
-    shared_ptr<material> mat_ptr; // 1
     double t;
-
     bool front_face;
+
+    shared_ptr<material> mat_ptr; // 1
 
     //<<判断光线与表面的内外位置关系来确定法线朝向>>
     inline void set_face_normal(const ray& r, const vec3& outward_normal) {

@@ -130,8 +130,6 @@
     <ClCompile Include="RayCameraAndBackGround.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Starter\color.h" />
-    <ClInclude Include="..\Starter\vec3.h" />
     <ClInclude Include="ray.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

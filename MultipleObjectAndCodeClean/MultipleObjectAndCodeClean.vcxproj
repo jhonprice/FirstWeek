@@ -130,9 +130,6 @@
     <ClCompile Include="MultipleObjectAndCodeClean.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\RayCameraAndBackGround\ray.h" />
-    <ClInclude Include="..\Starter\color.h" />
-    <ClInclude Include="..\Starter\vec3.h" />
     <ClInclude Include="hittable.h" />
     <ClInclude Include="hittable_list.h" />
     <ClInclude Include="rtweekend.h" />

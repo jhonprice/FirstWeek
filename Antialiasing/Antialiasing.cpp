@@ -1,4 +1,4 @@
-﻿// MultipleObjectAndCodeClean.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
+﻿// Antialiasing.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
 //
 
 #include <iostream>
@@ -24,16 +24,16 @@ int main()
     const int samples_per_pixel = 100;
 #pragma endregion
 
-    //<<构建场景：初始化可命中对象列表>>
+//<<构建场景：初始化可命中对象列表>>
+#pragma region buildWorld
     hittable_list world;
     world.add(make_shared<sphere>(point3(0, 0, -1), 0.5));
     world.add(make_shared<sphere>(point3(0, -100.5, -1), 100));
-
-
-//<<Camera相机视口参数设置>>
-#pragma region CameraInfo
-    camera cam;
 #pragma endregion
+
+
+    //<<Camera相机视口参数设置>>
+    camera cam;
 
 
 //<<Render渲染循环，输出到PPM文件>>

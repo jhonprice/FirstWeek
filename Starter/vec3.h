@@ -6,6 +6,9 @@ using std::sqrt;
 
 //<<3D向量的定义>>
 //+=<<产生随机的3D向量: 漫反射采样预选点>>
+//+=<<镜面反射函数>>
+//+=<<斯奈尔折射函数>>
+//+=<<光圈随机采样函数>>
 class vec3 {
 public:
 	//<<初始化部分>>
@@ -170,7 +173,7 @@ vec3 refract(const vec3& uv, const vec3& n, double etai_over_etat) {
 #pragma endregion
 
 
-
+//<<光圈随机采样函数>>
 vec3 random_in_unit_disk() {
     while (true) {
         auto p = vec3(random_double(-1, 1), random_double(-1, 1), 0);

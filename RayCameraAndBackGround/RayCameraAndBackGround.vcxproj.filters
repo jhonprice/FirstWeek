@@ -20,12 +20,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Starter\color.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Starter\vec3.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="ray.h">
       <Filter>头文件</Filter>
     </ClInclude>

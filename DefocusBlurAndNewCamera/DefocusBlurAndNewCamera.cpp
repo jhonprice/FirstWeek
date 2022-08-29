@@ -42,7 +42,7 @@ int main() {
     const int samples_per_pixel = 100;
     const int max_depth = 50;
 
-    //<<添加漫反射和镜面反射球和折射球>>
+//<<添加漫反射和镜面反射球和折射球>>
 #pragma region buildWorld
     hittable_list world;
 

@@ -129,11 +129,6 @@
   <ItemGroup>
     <ClCompile Include="SurfaceNormalAndCleanCode.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\RayCameraAndBackGround\ray.h" />
-    <ClInclude Include="..\Starter\color.h" />
-    <ClInclude Include="..\Starter\vec3.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
