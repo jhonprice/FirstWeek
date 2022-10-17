@@ -14,12 +14,13 @@ using namespace std::chrono;
 #include "sphere.h"
 #include "math_helper.h"
 #include "hittable_list.h"
+#include "camera.h"
 
 
 
 //初始化最终图像
-Film film{};
-
+Film film{640,360,3};
+const int samples_per_pixel = 100;
 
 RGBColor ray_color(Ray& r,const Scene& world) {
     Hit_record rec{};
@@ -49,31 +50,24 @@ int main()
     world.add(make_shared<Sphere>(Point3(0, -100.5, -1), 100));
 
 
-    //Camera
-    auto viewport_height = 2.0;
-    auto viewport_width = film.getAspectRadio()*viewport_height;
-    auto focal_length = 1.0;
 
-    //Camera坐标系下光的参数
-    auto origin = Point3(0, 0, 0);
-    auto horizontal = Vec3(viewport_width, 0, 0);
-    auto vertical = Vec3(0, viewport_height, 0);
-    auto lower_left_corner = origin - horizontal / 2 - vertical / 2 - Vec3(0, 0, focal_length);
+    Camera camera{ film.getAspectRadio() };
 
     //渲染循环
     auto start = system_clock::now();
-    for (int y{ 0 }; y < imageCH; y++) {
+    for (int y{ 0 }; y < imageCH; ++y) {
         std::cout << "\rScanlines remaining: " << y << ' ' << std::flush;
-        for (int x{ 0 }; x < imageCW; x++) {
-            auto u = double(x) / (imageCW - 1);
-            auto v = double(y) / (imageCH - 1);
+        for (int x{ 0 }; x < imageCW; ++x) {
+            RGBColor pixel_color(0, 0, 0);
 
-            //逻辑：世界坐标->相机坐标->ray_color根据y的变化进行插值 
-            Vec3 rayOrigin = origin;
-            Vec3 rayHit = lower_left_corner + u * horizontal + v * vertical - origin;
-            Ray r{ rayOrigin, rayHit };
-            film.setPix(y, x, ray_color(r, world));
-  
+            for (int s = 0; s < samples_per_pixel; ++s) {
+                auto u = double(x + random_double()) / (imageCW - 1);
+                auto v = double(y + random_double()) / (imageCH - 1);
+                Ray r{ camera.get_ray(u,v) };
+                pixel_color += ray_color(r, world);
+            }
+
+            film.setPix(y, x, pixel_color, samples_per_pixel);
         }
     }
     auto end = system_clock::now();
