@@ -12,6 +12,8 @@ using namespace std::chrono;
 #include "image.h"
 #include "ray.h"
 #include "sphere.h"
+#include "math_helper.h"
+#include "hittable_list.h"
 
 
 
@@ -19,10 +21,14 @@ using namespace std::chrono;
 Film film{};
 
 
-RGBColor ray_color(Ray& r) {
+RGBColor ray_color(Ray& r,const Scene& world) {
     Hit_record rec{};
-    if (Sphere{ {0,0,-1},0.5 }.hit(r, rec)) {
-        return 0.5 * RGBColor(rec.normal.x() + 1, rec.normal.y() + 1, rec.normal.z() + 1);
+    //if (Sphere{ {0,0,-1},0.5 }.hit(r, rec)) {
+    //    return 0.5 * (rec.normal + RGBColor(1, 1, 1));
+    //}
+
+    if (world.hit(r, rec)) {
+        return 0.5 * (rec.normal + RGBColor(1, 1, 1));
     }
 
     Vec3 unit_direction = unit_vector(r.m_dir);
@@ -35,6 +41,12 @@ int main()
     // Render：输出一张图片，列变化控制r分量，行变化控制g分量，b分量保持0.25
     const int imageCH = film.imageCH;
     const int imageCW = film.imageCW;
+
+
+    // World
+    Scene world;
+    world.add(make_shared<Sphere>(Point3(0, 0, -1), 0.5));
+    world.add(make_shared<Sphere>(Point3(0, -100.5, -1), 100));
 
 
     //Camera
@@ -60,10 +72,7 @@ int main()
             Vec3 rayOrigin = origin;
             Vec3 rayHit = lower_left_corner + u * horizontal + v * vertical - origin;
             Ray r{ rayOrigin, rayHit };
-            film.setPix(y,x,ray_color(r));
-
-            RGBColor pixColor;
-
+            film.setPix(y, x, ray_color(r, world));
   
         }
     }

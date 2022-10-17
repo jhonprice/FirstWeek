@@ -37,3 +37,4 @@ bool Hittable_list::hit(Ray& r, Hit_record& rec) const {
 
     return hit_anything;
 }
+using Scene = Hittable_list;
