@@ -129,6 +129,9 @@
   <ItemGroup>
     <ClCompile Include="Starter.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\stb_image_write.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
