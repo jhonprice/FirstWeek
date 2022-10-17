@@ -11,24 +11,7 @@ using namespace std::chrono;
 
 #include "image.h"
 #include "ray.h"
-
-struct Sphere {
-    Point3 ori{};
-    double r{};
-};
-
-
-//推导方程
-bool hit_sphere(const Sphere& sphere, const Ray& ray) {
-    Vec3 oc = ray.m_ori - sphere.ori;
-
-    auto a = dot(ray.m_dir, ray.m_dir);
-    auto b = 2.0 * dot(oc,ray.m_dir);
-    auto c = dot(oc, oc) - sphere.r * sphere.r;
-
-    auto discriminant = b * b - 4 * a * c;
-    return (discriminant > 0);
-}
+#include "sphere.h"
 
 
 
@@ -36,9 +19,10 @@ bool hit_sphere(const Sphere& sphere, const Ray& ray) {
 Film film{};
 
 
-RGBColor ray_color(const Ray& r) {
-    if (hit_sphere({{0,0,-1},0.5}, r)) {
-        return RGBColor(0, 0, 1);
+RGBColor ray_color(Ray& r) {
+    Hit_record rec{};
+    if (Sphere{ {0,0,-1},0.5 }.hit(r, rec)) {
+        return 0.5 * RGBColor(rec.normal.x() + 1, rec.normal.y() + 1, rec.normal.z() + 1);
     }
 
     Vec3 unit_direction = unit_vector(r.m_dir);
