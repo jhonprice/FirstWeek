@@ -13,15 +13,24 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="framework">
+      <UniqueIdentifier>{86631591-4e37-47f7-b66a-06d87ca309dc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Starter.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="vec3.cpp">
+      <Filter>framework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\stb_image_write.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="vec3.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="image.h">
+      <Filter>framework</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
