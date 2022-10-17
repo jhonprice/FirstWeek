@@ -21,9 +21,6 @@
     <ClCompile Include="Starter.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="vec3.cpp">
-      <Filter>framework</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vec3.h">
@@ -31,6 +28,9 @@
     </ClInclude>
     <ClInclude Include="image.h">
       <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="ray.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
