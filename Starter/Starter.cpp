@@ -12,10 +12,35 @@ using namespace std::chrono;
 #include "image.h"
 #include "ray.h"
 
+struct Sphere {
+    Point3 ori{};
+    double r{};
+};
+
+
+//推导方程
+bool hit_sphere(const Sphere& sphere, const Ray& ray) {
+    Vec3 oc = ray.m_ori - sphere.ori;
+
+    auto a = dot(ray.m_dir, ray.m_dir);
+    auto b = 2.0 * dot(oc,ray.m_dir);
+    auto c = dot(oc, oc) - sphere.r * sphere.r;
+
+    auto discriminant = b * b - 4 * a * c;
+    return (discriminant > 0);
+}
+
+
+
 //初始化最终图像
 Film film;
 
+
 RGBColor ray_color(const Ray& r) {
+    if (hit_sphere({{0,0,-1},0.1}, r)) {
+        return RGBColor(0, 0, 1);
+    }
+
     Vec3 unit_direction = unit_vector(r.m_dir);
     auto t = 0.5 * (unit_direction.y() + 1.0);
     return (1.0 - t) * RGBColor(1.0, 1.0, 1.0) + t * RGBColor(0.5, 0.7, 1.0);

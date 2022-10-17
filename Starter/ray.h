@@ -10,5 +10,4 @@ public:
 public:
 	Point3 m_ori;
 	Vec3 m_dir;
-	//double maxT;
 };
