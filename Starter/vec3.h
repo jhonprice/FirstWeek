@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include <iostream>
-
+#include "math_helper.h"
 using std::sqrt;
 
 class Vec3 {
@@ -46,6 +46,16 @@ public:
 
 public:
     double e[3];
+
+public:
+    // vec3随机函数
+    inline static Vec3 randomVec() {
+        return Vec3(random_double(), random_double(), random_double());
+    }
+
+    inline static Vec3 randomVec(double min, double max) {
+        return Vec3(random_double(min, max), random_double(min, max), random_double(min, max));
+    }
 };
 
 // Type aliases for vec3
@@ -99,5 +109,28 @@ inline Vec3 unit_vector(Vec3 v) {
     return v / v.length();
 }
 
+
+//产生一个四面八方随机的单位向量（一个单位圆以圆心为起点的所有向量
+Vec3 random_in_unit_sphere() {
+    while (true) {
+        auto p = Vec3::randomVec(-1, 1);
+        if (p.length_squared() >= 1) continue;
+        return p;
+    }
+}
+
+//郎伯反射的随机向量
+Vec3 random_unit_vector() {
+    return unit_vector(random_in_unit_sphere());
+}
+
+//半球散射的随机向量
+Vec3 random_in_hemisphere(const Vec3& normal) {
+    Vec3 in_unit_sphere = random_in_unit_sphere();
+    if (dot(in_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
+        return in_unit_sphere;
+    else
+        return -in_unit_sphere;
+}
 
 

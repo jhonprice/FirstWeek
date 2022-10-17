@@ -25,6 +25,7 @@ public:
 public:
     void setPix(int x, int y, RGBColor color);
     void setPix(int x, int y, RGBColor color, int samples_per_pixel);
+    void setPixWithGamma(int x, int y, RGBColor color, int samples_per_pixel);
     void writeTgaFile(const std::string& s);
     double getAspectRadio() { 
         return imageCW*1.f / imageCH; 
@@ -49,6 +50,17 @@ void Film::setPix(int x, int y, RGBColor color, int samples_per_pixel) {
 
     auto scale = 1.0 / samples_per_pixel;
     auto tmpRGB = color * scale;
+
+
+    result[(x * imageCW + y) * 3 + 0] = static_cast<int>(256 * clamp(tmpRGB.x(), 0.0, 0.999));
+    result[(x * imageCW + y) * 3 + 1] = static_cast<int>(256 * clamp(tmpRGB.y(), 0.0, 0.999));
+    result[(x * imageCW + y) * 3 + 2] = static_cast<int>(256 * clamp(tmpRGB.z(), 0.0, 0.999));
+}
+
+void Film::setPixWithGamma(int x, int y, RGBColor color, int samples_per_pixel) {
+
+    auto scale = 1.0 / samples_per_pixel;
+    RGBColor tmpRGB{ sqrt(color.x() * scale),sqrt(color.y() * scale), sqrt(color.z() * scale)};
 
 
     result[(x * imageCW + y) * 3 + 0] = static_cast<int>(256 * clamp(tmpRGB.x(), 0.0, 0.999));

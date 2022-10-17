@@ -21,15 +21,27 @@ using namespace std::chrono;
 //初始化最终图像
 Film film{};
 const int samples_per_pixel = 20;
+const int max_depth = 50;
+const int imageCH = film.imageCH;
+const int imageCW = film.imageCW;
 
-RGBColor ray_color(Ray& r,const Scene& world) {
+
+RGBColor ray_color(Ray& r,const Scene& world, int depth) {
     Hit_record rec{};
-    //if (Sphere{ {0,0,-1},0.5 }.hit(r, rec)) {
-    //    return 0.5 * (rec.normal + RGBColor(1, 1, 1));
-    //}
+
+
+    if (depth <= 0)
+        return RGBColor(0, 0, 0);
 
     if (world.hit(r, rec)) {
-        return 0.5 * (rec.normal + RGBColor(1, 1, 1));
+        //return 0.5 * (rec.normal + RGBColor(1, 1, 1));
+
+        //不同的散射方式
+        //Point3 target = rec.p + rec.normal + random_in_hemisphere(rec.normal);
+        Point3 target = rec.p + rec.normal + random_unit_vector();
+        //Point3 target = rec.p + rec.normal + random_in_unit_sphere();
+        auto nextRay = Ray{ rec.p, target - rec.p };
+        return 0.5 * ray_color(nextRay, world, depth-1);
     }
 
     Vec3 unit_direction = unit_vector(r.m_dir);
@@ -39,10 +51,6 @@ RGBColor ray_color(Ray& r,const Scene& world) {
 
 int main()
 {
-    // Render：输出一张图片，列变化控制r分量，行变化控制g分量，b分量保持0.25
-    const int imageCH = film.imageCH;
-    const int imageCW = film.imageCW;
-
 
     // World
     Scene world;
@@ -64,10 +72,10 @@ int main()
                 auto u = double(x + random_double()) / (imageCW - 1);
                 auto v = double(y + random_double()) / (imageCH - 1);
                 Ray r{ camera.get_ray(u,v) };
-                pixel_color += ray_color(r, world);
+                pixel_color += ray_color(r, world, max_depth);
             }
 
-            film.setPix(y, x, pixel_color, samples_per_pixel);
+            film.setPixWithGamma(y, x, pixel_color, samples_per_pixel);
         }
     }
     auto end = system_clock::now();
