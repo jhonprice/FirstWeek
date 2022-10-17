@@ -47,7 +47,7 @@ int main()
             auto u = double(x) / (imageCW - 1);
             auto v = double(y) / (imageCH - 1);
 
-            //逻辑：世界坐标->相机坐标->ray_color根据y的变化进行插值
+            //逻辑：世界坐标->相机坐标->ray_color根据y的变化进行插值 
             Vec3 rayOrigin = origin;
             Vec3 rayHit = lower_left_corner + u * horizontal + v * vertical - origin;
             Ray r{ rayOrigin, rayHit };
