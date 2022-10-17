@@ -19,8 +19,8 @@ using namespace std::chrono;
 
 
 //初始化最终图像
-Film film{640,360,3};
-const int samples_per_pixel = 100;
+Film film{};
+const int samples_per_pixel = 20;
 
 RGBColor ray_color(Ray& r,const Scene& world) {
     Hit_record rec{};
