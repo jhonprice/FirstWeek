@@ -24,7 +24,9 @@ public:
 public:
     void setPix(int x, int y, RGBColor color);
     void writeTgaFile(const std::string& s);
-    double getAspectRadio() { return imageCW / imageCH; }
+    double getAspectRadio() { 
+        return imageCW*1.f / imageCH; 
+    }
 };
 
 

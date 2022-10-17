@@ -33,11 +33,11 @@ bool hit_sphere(const Sphere& sphere, const Ray& ray) {
 
 
 //初始化最终图像
-Film film;
+Film film{};
 
 
 RGBColor ray_color(const Ray& r) {
-    if (hit_sphere({{0,0,-1},0.1}, r)) {
+    if (hit_sphere({{0,0,-1},0.5}, r)) {
         return RGBColor(0, 0, 1);
     }
 
@@ -55,7 +55,7 @@ int main()
 
     //Camera
     auto viewport_height = 2.0;
-    auto viewport_width = film.getAspectRadio() * viewport_height;
+    auto viewport_width = film.getAspectRadio()*viewport_height;
     auto focal_length = 1.0;
 
     //Camera坐标系下光的参数
