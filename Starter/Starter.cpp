@@ -55,7 +55,7 @@ int main()
     auto material_center = make_shared<Lambertian>(RGBColor(0.8, 0.8, 0.0));
     auto material_ground = make_shared<Lambertian>(RGBColor(0.7, 0.3, 0.3));
 
-    auto material_left = make_shared<Metal>(RGBColor(0.8, 0.8, 0.8));
+    auto material_left = make_shared<Dielectric>(1.5);
     auto material_fuzz_right = make_shared<Metal>(RGBColor(0.8, 0.6, 0.2),0.5);
 
     // World
@@ -65,6 +65,7 @@ int main()
     world.add(make_shared<Sphere>(Point3(0, -100.5, -1), 100, material_ground));
 
     world.add(make_shared<Sphere>(Point3(-1.0, 0.0, -1.0), 0.5, material_left));
+    world.add(make_shared<Sphere>(Point3(-1.0, 0.0, -1.0), -0.4, material_left));
     world.add(make_shared<Sphere>(Point3(1.0, 0.0, -1.0), 0.5, material_fuzz_right));
 
 
