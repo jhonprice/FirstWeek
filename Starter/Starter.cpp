@@ -23,9 +23,10 @@ using namespace std::chrono;
 Film film{};
 const int samples_per_pixel = 20;
 const int max_depth = 50;
+const float cameraFov = 120.0;
+
 const int imageCH = film.imageCH;
 const int imageCW = film.imageCW;
-
 
 RGBColor ray_color(Ray& r,const Scene& world, int depth) {
     Hit_record rec{};
@@ -70,7 +71,7 @@ int main()
 
 
 
-    Camera camera{ film.getAspectRadio() };
+    Camera camera{ {{-2,2,1},{0,0,-1},{0,1,0}}, cameraFov, film.getAspectRadio() };
 
     //渲染循环
     auto start = system_clock::now();
