@@ -16,14 +16,16 @@ using namespace std::chrono;
 #include "hittable_list.h"
 #include "camera.h"
 #include "material.h"
+#include "moving_sphere.h"
 
 //构建场景
 Scene random_scene();
+Scene random_scene_test();
 
 
 //初始化最终图像
 Film film{};
-const int samples_per_pixel = 500;
+const int samples_per_pixel = 20;
 const int max_depth = 50;
 const float cameraFov = 20.0;
 
@@ -57,15 +59,13 @@ int main()
     
 
     // World
-    Scene world{ random_scene() };
-
-
+    Scene world{ random_scene_test() };
 
 
 
     //Camera camera{ {{-2,2,1},{0,0,-1},{0,1,0}}, cameraFov, film.getAspectRadio() };
 
-    RealCamera camera{{{13,2,3},{0,0,0},{0,1,0}}, cameraFov, film.getAspectRadio()};
+    RealCamera camera{{{13,2,3},{0,0,0},{0,1,0}}, cameraFov, film.getAspectRadio(),0.,1.};
 
     //渲染循环
     auto start = system_clock::now();
@@ -108,8 +108,9 @@ Scene random_scene() {
     world.add(make_shared<Sphere>(Point3(0, -1000, 0), 1000, ground_material));
 
     // 创建最多22*22个随机小球，即最多484个随机小球
-    for (int a = -11; a < 11; a++) {
-        for (int b = -11; b < 11; b++) {
+    int minRandom = -11, maxRandom = 11;
+    for (int a = minRandom; a < maxRandom; a++) {
+        for (int b = minRandom; b < maxRandom; b++) {
             // 随机一个选择材质的浮点数，主要用于随机不同材质的球的概率
             auto choose_mat = random_double();
             // 随机当前小球的中心位置
@@ -124,7 +125,9 @@ Scene random_scene() {
                     // diffuse
                     auto albedo = RGBColor::randomVec() * RGBColor::randomVec();
                     sphere_material = make_shared<Lambertian>(albedo);
-                    world.add(make_shared<Sphere>(center, 0.2, sphere_material));
+
+                    auto center2 = center + Vec3(0, random_double(0,.5), 0);
+                    world.add(make_shared<MovingSphere>(center,center2,0.,1.,0.2,sphere_material));
                 }
                 // 如果随机材质浮点数小于0.95，即创建金属材质，即15%的概率 
                 else if (choose_mat < 0.95) {
@@ -155,6 +158,27 @@ Scene random_scene() {
     // 金属大球
     auto material3 = make_shared<Metal>(RGBColor(0.7, 0.6, 0.5), 0.0);
     world.add(make_shared<Sphere>(Point3(4, 1, 0), 1.0, material3));
+
+    return world;
+}
+
+
+// 创建一个随机场景
+Scene random_scene_test() {
+    Scene world;
+
+    // 地表材质：散射光材质，灰色
+    auto ground_material = make_shared<Lambertian>(RGBColor(0.5, 0.5, 0.5));
+    // 添加一个特别大的球作为地表
+    world.add(make_shared<Sphere>(Point3(0, -1000, 0), 1000, ground_material));
+
+    // diffuse
+    auto albedo = RGBColor::randomVec() * RGBColor::randomVec();
+    auto sphere_material = make_shared<Lambertian>(albedo);
+
+    Point3 center(0.9 * random_double(), 0.2, 0.9 * random_double());
+    auto center2 = center + Vec3(0, random_double(0, .5), 0);
+    world.add(make_shared<MovingSphere>(center, center2, 0., 1., 0.2, sphere_material));
 
     return world;
 }

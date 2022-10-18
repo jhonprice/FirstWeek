@@ -52,6 +52,8 @@ class RealCamera :public Camera {
 protected:
     Vec3 u, v, w;
     double lens_radius{};
+    double m_time0 = 0;
+    double m_time1 = 0;
 
 public:
     //生成一个单位圆平面内的随机向量
@@ -63,7 +65,9 @@ public:
         }
     }
     RealCamera(CameraFrame frame, double vfov,// 垂直的fov - 度数表示
-        double aspect_ratio, 
+        double aspect_ratio,
+        double time0 = 0,
+        double time1 = 0,
         double lenLength=0.1) {
         auto focusTodistLength = frame.dist_to_focus();
 
@@ -85,7 +89,10 @@ public:
         lower_left_corner = origin - horizontal / 2 - vertical / 2 - focusTodistLength * w;
 
         lens_radius = lenLength / 2;
-
+        
+        m_time0 = time0;
+        m_time1 = time1;
+        
     }
 
     Ray get_ray(double s, double t) const{
@@ -93,6 +100,7 @@ public:
         Vec3 offset = u * rd.x() + v * rd.y();
 
         Point3 rayOri = origin + offset;
-        return Ray(origin+ offset, lower_left_corner + s * horizontal + t * vertical - rayOri);
+        return Ray(origin+ offset, 
+            lower_left_corner + s * horizontal + t * vertical - rayOri,random_double(m_time0, m_time1));
     }
 };
