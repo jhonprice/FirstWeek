@@ -71,7 +71,9 @@ int main()
 
 
 
-    Camera camera{ {{-2,2,1},{0,0,-1},{0,1,0}}, cameraFov, film.getAspectRadio() };
+    //Camera camera{ {{-2,2,1},{0,0,-1},{0,1,0}}, cameraFov, film.getAspectRadio() };
+    auto aperture = 2.0;
+    RealCamera camera{{{-2,2,1},{0,0,-1},{0,1,0}}, cameraFov, film.getAspectRadio() ,aperture };
 
     //渲染循环
     auto start = system_clock::now();
