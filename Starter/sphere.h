@@ -6,6 +6,8 @@
 class Sphere : public Shape {
 public:
     Sphere() {}
+    Sphere(Point3 cen, double r, std::shared_ptr<Material> m)
+        : m_ori(cen), m_r(r), mat_ptr(m) {};
     Sphere(Point3 cen, double r) : m_ori(cen), m_r(r) {};
 
     virtual bool hit(
@@ -14,6 +16,7 @@ public:
 public:
     Point3 m_ori;
     double m_r;
+    std::shared_ptr<Material> mat_ptr;
 };
 
 bool Sphere::hit(Ray& ray, Hit_record& rec) const {
@@ -36,6 +39,7 @@ bool Sphere::hit(Ray& ray, Hit_record& rec) const {
     
     rec.p = ray.at(rec.t);
     rec.set_face_normal(ray, (rec.p - m_ori) / m_r);  //…Ë÷√rec.normal
+    rec.mat_ptr = mat_ptr; //…Ë÷√≤ƒ÷ 
 
     return true;
 }

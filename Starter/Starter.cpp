@@ -15,6 +15,7 @@ using namespace std::chrono;
 #include "math_helper.h"
 #include "hittable_list.h"
 #include "camera.h"
+#include "material.h"
 
 
 
@@ -34,14 +35,12 @@ RGBColor ray_color(Ray& r,const Scene& world, int depth) {
         return RGBColor(0, 0, 0);
 
     if (world.hit(r, rec)) {
-        //return 0.5 * (rec.normal + RGBColor(1, 1, 1));
-
-        //不同的散射方式
-        //Point3 target = rec.p + rec.normal + random_in_hemisphere(rec.normal);
-        Point3 target = rec.p + rec.normal + random_unit_vector();
-        //Point3 target = rec.p + rec.normal + random_in_unit_sphere();
-        auto nextRay = Ray{ rec.p, target - rec.p };
-        return 0.5 * ray_color(nextRay, world, depth-1);
+        
+        Ray scattered{};
+        RGBColor attenuation{};
+        if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+            return attenuation * ray_color(scattered, world, depth - 1);
+        return RGBColor(0, 0, 0);
     }
 
     Vec3 unit_direction = unit_vector(r.m_dir);
@@ -50,12 +49,23 @@ RGBColor ray_color(Ray& r,const Scene& world, int depth) {
 }
 
 int main()
-{
+{    
+    
+    //材质
+    auto material_center = make_shared<Lambertian>(RGBColor(0.8, 0.8, 0.0));
+    auto material_ground = make_shared<Lambertian>(RGBColor(0.7, 0.3, 0.3));
+
+    auto material_left = make_shared<Metal>(RGBColor(0.8, 0.8, 0.8));
+    auto material_fuzz_right = make_shared<Metal>(RGBColor(0.8, 0.6, 0.2),0.5);
 
     // World
     Scene world;
-    world.add(make_shared<Sphere>(Point3(0, 0, -1), 0.5));
-    world.add(make_shared<Sphere>(Point3(0, -100.5, -1), 100));
+
+    world.add(make_shared<Sphere>(Point3(0, 0, -1), 0.5, material_center));
+    world.add(make_shared<Sphere>(Point3(0, -100.5, -1), 100, material_ground));
+
+    world.add(make_shared<Sphere>(Point3(-1.0, 0.0, -1.0), 0.5, material_left));
+    world.add(make_shared<Sphere>(Point3(1.0, 0.0, -1.0), 0.5, material_fuzz_right));
 
 
 

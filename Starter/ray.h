@@ -2,6 +2,7 @@
 #include "vec3.h"
 class Ray {
 public:
+	Ray(){};
 	Ray(Point3 ori, Vec3 dir) :m_ori(ori), m_dir(dir) {}
 
 	Point3 at(double t) const{
