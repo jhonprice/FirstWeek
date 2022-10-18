@@ -64,7 +64,7 @@ public:
     }
     RealCamera(CameraFrame frame, double vfov,// 垂直的fov - 度数表示
         double aspect_ratio, 
-        double lenLength) {
+        double lenLength=0.1) {
         auto focusTodistLength = frame.dist_to_focus();
 
         auto theta = degrees_to_radians(vfov);

@@ -17,13 +17,15 @@ using namespace std::chrono;
 #include "camera.h"
 #include "material.h"
 
+//构建场景
+Scene random_scene();
 
 
 //初始化最终图像
 Film film{};
-const int samples_per_pixel = 20;
+const int samples_per_pixel = 500;
 const int max_depth = 50;
-const float cameraFov = 120.0;
+const float cameraFov = 20.0;
 
 const int imageCH = film.imageCH;
 const int imageCW = film.imageCW;
@@ -52,28 +54,18 @@ RGBColor ray_color(Ray& r,const Scene& world, int depth) {
 int main()
 {    
     
-    //材质
-    auto material_center = make_shared<Lambertian>(RGBColor(0.8, 0.8, 0.0));
-    auto material_ground = make_shared<Lambertian>(RGBColor(0.7, 0.3, 0.3));
-
-    auto material_left = make_shared<Dielectric>(1.5);
-    auto material_fuzz_right = make_shared<Metal>(RGBColor(0.8, 0.6, 0.2),0.5);
+    
 
     // World
-    Scene world;
+    Scene world{ random_scene() };
 
-    world.add(make_shared<Sphere>(Point3(0, 0, -1), 0.5, material_center));
-    world.add(make_shared<Sphere>(Point3(0, -100.5, -1), 100, material_ground));
 
-    world.add(make_shared<Sphere>(Point3(-1.0, 0.0, -1.0), 0.5, material_left));
-    world.add(make_shared<Sphere>(Point3(-1.0, 0.0, -1.0), -0.4, material_left));
-    world.add(make_shared<Sphere>(Point3(1.0, 0.0, -1.0), 0.5, material_fuzz_right));
 
 
 
     //Camera camera{ {{-2,2,1},{0,0,-1},{0,1,0}}, cameraFov, film.getAspectRadio() };
-    auto aperture = 2.0;
-    RealCamera camera{{{-2,2,1},{0,0,-1},{0,1,0}}, cameraFov, film.getAspectRadio() ,aperture };
+
+    RealCamera camera{{{13,2,3},{0,0,0},{0,1,0}}, cameraFov, film.getAspectRadio()};
 
     //渲染循环
     auto start = system_clock::now();
@@ -102,4 +94,67 @@ int main()
     //报告完成
     std::cout << "\nDone: "<< double(duration.count()) * microseconds::period::num / microseconds::period::den<<" s" << std::endl;
     return 0;
+}
+
+
+
+// 创建一个随机场景
+Scene random_scene() {
+    Scene world;
+
+    // 地表材质：散射光材质，灰色
+    auto ground_material = make_shared<Lambertian>(RGBColor(0.5, 0.5, 0.5));
+    // 添加一个特别大的球作为地表
+    world.add(make_shared<Sphere>(Point3(0, -1000, 0), 1000, ground_material));
+
+    // 创建最多22*22个随机小球，即最多484个随机小球
+    for (int a = -11; a < 11; a++) {
+        for (int b = -11; b < 11; b++) {
+            // 随机一个选择材质的浮点数，主要用于随机不同材质的球的概率
+            auto choose_mat = random_double();
+            // 随机当前小球的中心位置
+            Point3 center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
+
+            // 如果中心位置不太靠世界坐标原点左右
+            if ((center - Point3(4, 0.2, 0)).length() > 0.9) {
+                shared_ptr<Material> sphere_material;
+
+                // 如果随机材质浮点数小于0.8，即创建散射材质，即80%的概率 
+                if (choose_mat < 0.8) {
+                    // diffuse
+                    auto albedo = RGBColor::randomVec() * RGBColor::randomVec();
+                    sphere_material = make_shared<Lambertian>(albedo);
+                    world.add(make_shared<Sphere>(center, 0.2, sphere_material));
+                }
+                // 如果随机材质浮点数小于0.95，即创建金属材质，即15%的概率 
+                else if (choose_mat < 0.95) {
+                    // metal
+                    auto albedo = RGBColor::randomVec(0.5, 1);
+                    auto fuzz = random_double(0, 0.5);
+                    sphere_material = make_shared<Metal>(albedo, fuzz);
+                    world.add(make_shared<Sphere>(center, 0.2, sphere_material));
+                }
+                // 剩下的5%的概率创建玻璃球 
+                else {
+                    // glass
+                    sphere_material = make_shared<Dielectric>(1.5);
+                    world.add(make_shared<Sphere>(center, 0.2, sphere_material));
+                }
+            }
+        }
+    }
+
+    // 玻璃大球
+    auto material1 = make_shared<Dielectric>(1.5);
+    world.add(make_shared<Sphere>(Point3(0, 1, 0), 1.0, material1));
+
+    // 散射大球
+    auto material2 = make_shared<Lambertian>(RGBColor(0.4, 0.2, 0.1));
+    world.add(make_shared<Sphere>(Point3(-4, 1, 0), 1.0, material2));
+
+    // 金属大球
+    auto material3 = make_shared<Metal>(RGBColor(0.7, 0.6, 0.5), 0.0);
+    world.add(make_shared<Sphere>(Point3(4, 1, 0), 1.0, material3));
+
+    return world;
 }
