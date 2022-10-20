@@ -1,6 +1,6 @@
 #pragma once
 #include "vec3.h"
-
+#include "perlin.h"
 class Texture {
 public:
 	virtual RGBColor value(double u, double v, const Point3& p) const = 0;
@@ -46,4 +46,39 @@ public:
 public:
     std::shared_ptr<Texture> odd;  // 白色纹理
     std::shared_ptr<Texture> even; // 深绿纹理
+};
+
+
+
+
+class NoiseTexture : public Texture {
+public:
+    NoiseTexture() {}
+    NoiseTexture(double sc):scale(sc) {}
+
+    virtual RGBColor value(double u, double v, const Point3& p) const override {
+        return RGBColor(1, 1, 1) * noise.noise(scale*p);
+    }
+
+public:
+    Perlin noise;
+    double scale;
+};
+
+
+
+class NoiseTextureVec : public Texture {
+public:
+    NoiseTextureVec() {}
+    NoiseTextureVec(double sc) :scale(sc) {}
+
+    virtual RGBColor value(double u, double v, const Point3& p) const override {
+        //return RGBColor(1, 1, 1) * 0.5 * (1.0 + noise.noise(scale * p));
+        //return RGBColor(1, 1, 1) * noise.turb(scale * p);
+        return RGBColor(1, 1, 1) * 0.5 * (1 + sin(scale * p.z() + 10 * noise.turb(p)));
+    }
+
+public:
+    PerlinVec noise;
+    double scale;
 };

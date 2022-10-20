@@ -23,6 +23,7 @@ using namespace std::chrono;
 Scene random_scene();
 Scene random_scene_test();
 Scene two_spheres_scene();
+Scene two_perlin_spheres();
 
 
 //初始化最终图像
@@ -61,12 +62,15 @@ int main()
 {   
     Scene scene{};
 
-    switch (2) {
+    switch (3) {
         case 1:
             scene = random_scene();
             break;
         case 2:
             scene = two_spheres_scene();
+            break;
+        case 3:
+            scene = two_perlin_spheres();
             break;
         default:
             scene = random_scene_test();
@@ -215,5 +219,16 @@ Scene two_spheres_scene() {
 
 
     return world;
+}
+
+
+Scene two_perlin_spheres() {
+    Scene objects;
+
+    auto pertext = make_shared<NoiseTextureVec>(4);
+    objects.add(std::make_shared<Sphere>(Point3(0, -1000, 0), 1000, std::make_shared<Lambertian>(pertext)));
+    objects.add(std::make_shared<Sphere>(Point3(0, 2, 0), 2, std::make_shared<Lambertian>(pertext)));
+
+    return objects;
 }
 
