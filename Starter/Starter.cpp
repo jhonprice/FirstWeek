@@ -22,11 +22,12 @@ using namespace std::chrono;
 //构建场景
 Scene random_scene();
 Scene random_scene_test();
+Scene two_spheres_scene();
 
 
 //初始化最终图像
 Film film{400,225,3};
-const int samples_per_pixel = 10;
+const int samples_per_pixel = 50;
 const int max_depth = 50;
 const float cameraFov = 20.0;
 const double minTime = 0.;
@@ -57,16 +58,28 @@ RGBColor ray_color(Ray& r,const Hittable& world, int depth) {
 }
 
 int main()
-{    
+{   
+    Scene scene{};
+
+    switch (2) {
+        case 1:
+            scene = random_scene();
+            break;
+        case 2:
+            scene = two_spheres_scene();
+            break;
+        default:
+            scene = random_scene_test();
+            break;
+    }
+
     
     // World
     //Scene world{ random_scene() };
-    BVH_NODE world{ { random_scene() } ,minTime ,maxTime };
-
+    BVH_NODE world{ { scene } ,minTime ,maxTime };
 
 
     //Camera camera{ {{-2,2,1},{0,0,-1},{0,1,0}}, cameraFov, film.getAspectRadio() };
-
     RealCamera camera{{{13,2,3},{0,0,0},{0,1,0}}, cameraFov, film.getAspectRadio(),0.,1.};
 
     //渲染循环
@@ -104,10 +117,12 @@ int main()
 Scene random_scene() {
     Scene world;
 
-    // 地表材质：散射光材质，灰色
-    auto ground_material = make_shared<Lambertian>(RGBColor(0.5, 0.5, 0.5));
+    // 地表材质：散射光材质，灰色纯色纹理
+    auto ground_material1 = make_shared<Lambertian>(make_shared<SolidColor>(RGBColor(0.5, 0.5, 0.5)));
+    // 地表材质：散射光材质，棋盘纹理
+    auto ground_material2 = make_shared<Lambertian>(make_shared<CheckerTexture>(RGBColor(0.2, 0.3, 0.1), RGBColor(0.9, 0.9, 0.9)));
     // 添加一个特别大的球作为地表
-    world.add(make_shared<Sphere>(Point3(0, -1000, 0), 1000, ground_material));
+    world.add(make_shared<Sphere>(Point3(0, -1000, 0), 1000, ground_material2));
 
     // 创建最多22*22个随机小球，即最多484个随机小球
     int minRandom = -11, maxRandom = 11;
@@ -184,3 +199,21 @@ Scene random_scene_test() {
 
     return world;
 }
+
+// 纹理测试场景
+Scene two_spheres_scene() {
+    Scene world;
+
+    // 材质：散射光材质，棋盘纹理
+    auto ground_material = make_shared<Lambertian>(make_shared<CheckerTexture>(RGBColor(0.2, 0.3, 0.1), RGBColor(0.9, 0.9, 0.9)));
+    
+    //两个大球
+    world.add(std::make_shared<Sphere>(Point3(0, -10, 0), 10, ground_material));
+    world.add(std::make_shared<Sphere>(Point3(0, 10, 0), 10, ground_material));
+
+    
+
+
+    return world;
+}
+

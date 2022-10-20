@@ -5,10 +5,11 @@ class Material;
 
 //记录交点信息和材质
 struct Hit_record {
-    Point3 p;
-    Vec3 normal;
-    double t;
-    bool front_face;
+    Point3 p{};
+    Vec3 normal{};
+    double t{};
+    bool front_face{};
+    std::pair<double, double> uv{};
 
     std::shared_ptr<Material> mat_ptr;
 

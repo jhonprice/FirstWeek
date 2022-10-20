@@ -1,6 +1,7 @@
 #pragma once
 #include "hittable.h"
 #include "ray.h"
+#include "texture.h"
 
 class Material {
 public:
@@ -12,7 +13,9 @@ public:
 
 class Lambertian : public Material {
 public:
-    Lambertian(const RGBColor& a) : albedo(a) {}
+
+    Lambertian(const RGBColor& a) : albedo(std::make_shared<SolidColor>(a)) {}
+    Lambertian(std::shared_ptr<Texture> a) : albedo(a) {}
 
     virtual bool scatter(
         const Ray& r_in, const Hit_record& rec, RGBColor& attenuation, Ray& scattered
@@ -32,12 +35,13 @@ public:
 
 
         scattered = Ray(rec.p, scatter_direction, r_in.m_time);
-        attenuation = albedo;
+        attenuation = albedo->value(rec.uv.first, rec.uv.second,rec.p);
         return true;
     }
 
 public:
-    RGBColor albedo;
+    //RGBColor albedo;
+    std::shared_ptr<Texture> albedo;
 };
 
 
