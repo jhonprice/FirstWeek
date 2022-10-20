@@ -33,9 +33,9 @@ Scene cornell_box();
 //初始化最终图像
 Film film{ 600,600,3};
 //Film film{};
-const int samples_per_pixel = 200;
+const int samples_per_pixel = 10;
 const int max_depth = 50;
-const float cameraFov = 20.0;
+float cameraFov = 20.0;
 const double minTime = 0.;
 const double maxTime = 1.;
 
@@ -98,6 +98,7 @@ int main()
         case 6:
             bgColor = RGBColor{ 0,0,0 };
             cFrame = { {278,278,-800},{278,278,0},{0,1,0} };
+            cameraFov = 40.;
             scene = cornell_box();
             break;
         default:
