@@ -22,8 +22,8 @@ Scene random_scene();
 
 
 //初始化最终图像
-Film film{};
-const int samples_per_pixel = 500;
+Film film{400,300,3};
+const int samples_per_pixel = 1;
 const int max_depth = 50;
 const float cameraFov = 20.0;
 
@@ -37,7 +37,7 @@ RGBColor ray_color(Ray& r,const Scene& world, int depth) {
     if (depth <= 0)
         return RGBColor(0, 0, 0);
 
-    if (world.hit(r, rec)) {
+    if (world.hit(r, 0.001, infinity,rec)) {
         
         Ray scattered{};
         RGBColor attenuation{};

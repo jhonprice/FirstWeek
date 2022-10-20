@@ -11,7 +11,7 @@ public:
     Sphere(Point3 cen, double r) : m_ori(cen), m_r(r) {};
 
     virtual bool hit(
-        Ray& ray, Hit_record& rec) const override;
+        const Ray& ray, double t_min, double t_max, Hit_record& rec) const override;
 
 public:
     Point3 m_ori;
@@ -19,7 +19,7 @@ public:
     std::shared_ptr<Material> mat_ptr;
 };
 
-bool Sphere::hit(Ray& ray, Hit_record& rec) const {
+bool Sphere::hit(const Ray& ray, double t_min, double t_max, Hit_record& rec) const {
     Vec3 oc = ray.m_ori - m_ori;
 
     auto a = dot(ray.m_dir, ray.m_dir);
@@ -33,7 +33,7 @@ bool Sphere::hit(Ray& ray, Hit_record& rec) const {
     else {
         rec.t = (-b - sqrt(discriminant)) / (2.0 * a);
 
-        if (rec.t < ray.tMin || ray.tMax < rec.t)
+        if (rec.t < t_min || t_max < rec.t)
             return false;
     }
     

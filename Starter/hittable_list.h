@@ -16,21 +16,21 @@ public:
     void add(shared_ptr<Hittable> object) { objects.push_back(object); }
 
     virtual bool hit(
-        Ray& r, Hit_record& rec) const override;
+        const Ray& r, double t_min, double t_max, Hit_record& rec) const override;
 
 public:
     std::vector<shared_ptr<Hittable>> objects;
 };
 
-bool Hittable_list::hit(Ray& r, Hit_record& rec) const {
+bool Hittable_list::hit(const Ray& r, double t_min, double t_max,Hit_record& rec) const {
     Hit_record temp_rec;
     bool hit_anything = false;
-    auto closest_so_far = r.tMax;
+    auto closest_so_far = t_max;
 
     for (const auto& object : objects) {
-        if (object->hit(r, temp_rec)) {
+        if (object->hit(r, t_min, closest_so_far,temp_rec)) {
             hit_anything = true;
-            r.tMax = temp_rec.t;
+            closest_so_far = temp_rec.t;
             rec = temp_rec;
         }
     }
