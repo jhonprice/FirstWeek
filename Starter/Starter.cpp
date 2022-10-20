@@ -51,7 +51,7 @@ RGBColor ray_color(Ray& r,const Hittable& world, int depth, RGBColor bgColor) {
     if (depth <= 0)
         return RGBColor(0, 0, 0);
 
-    if (world.hit(r, rec)) {
+    if (world.hit(r, 0.001, infinity,rec)) {
         
         Ray scattered{};
         RGBColor attenuation{};

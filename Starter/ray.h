@@ -11,8 +11,5 @@ public:
 public:
 	Point3 m_ori;
 	Vec3 m_dir;
-	double tMin{0.001};
-	double tMax{std::numeric_limits<double>::infinity()};
-
 	double m_time;
 };
