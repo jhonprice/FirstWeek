@@ -46,7 +46,7 @@ public:
 		double time0, 
 		double time1);
 
-	virtual bool hit(Ray& r, Hit_record& rec) const override;
+	virtual bool hit(const Ray& r, double t_min, double t_max, Hit_record& rec) const override;
 	virtual bool bounding_box(double time0, double time1, AABB& output_box) const override;
 
 
@@ -61,18 +61,13 @@ bool BVH_NODE::bounding_box(double time0, double time1, AABB& output_box) const 
 	return true;
 }
 
-bool BVH_NODE::hit(Ray& r, Hit_record& rec) const {
-	if (!box.hit(r))
+bool BVH_NODE::hit(const Ray& r, double t_min, double t_max, Hit_record& rec) const {
+	if (!box.hit(r, t_min, t_max))
 		return false;
 
-	bool hit_left = left->hit(r, rec);
-	if (hit_left) {
-		r.tMax = rec.t;
-	}
-	bool hit_right = right->hit(r, rec);
-	if (hit_right) {
-		r.tMax = rec.t;
-	}
+	bool hit_left = left->hit(r, t_min, t_max, rec);
+	bool hit_right = right->hit(r, t_min, hit_left ? rec.t : t_max, rec);
+
 
 	return hit_left || hit_right;
 }

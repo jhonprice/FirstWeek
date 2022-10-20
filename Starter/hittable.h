@@ -30,7 +30,7 @@ public:
     Translate(std::shared_ptr<Hittable> p, const Vec3& displacement)
         : ptr(p), offset(displacement) {}
 
-    virtual bool hit(Ray& r, Hit_record& rec) const override;
+    virtual bool hit(const Ray& r, double t_min, double t_max,Hit_record& rec) const override;
 
     virtual bool bounding_box(double time0, double time1, AABB& output_box) const override;
 
@@ -39,9 +39,9 @@ public:
     Vec3 offset;
 };
 
-bool Translate::hit(Ray& r, Hit_record& rec) const {
+bool Translate::hit(const Ray& r, double t_min, double t_max, Hit_record& rec) const {
     Ray moved_r(r.m_ori - offset, r.m_dir, r.m_time);
-    if (!ptr->hit(moved_r, rec))
+    if (!ptr->hit(moved_r, t_min, t_max, rec))
         return false;
 
     rec.p += offset;
@@ -65,7 +65,7 @@ class Rotate_Y : public Hittable {
 public:
     Rotate_Y(std::shared_ptr<Hittable> p, double angle);
 
-    virtual bool hit(Ray& r, Hit_record& rec) const override;
+    virtual bool hit(const Ray& r, double t_min, double t_max, Hit_record& rec) const override;
 
     virtual bool bounding_box(double time0, double time1, AABB& output_box) const override {
         output_box = bbox;
@@ -117,7 +117,7 @@ Rotate_Y::Rotate_Y(std::shared_ptr<Hittable> p, double angle) : ptr(p) {
     bbox = AABB(min, max);
 }
 
-bool Rotate_Y::hit(Ray& r, Hit_record& rec) const {
+bool Rotate_Y::hit(const Ray& r, double t_min, double t_max, Hit_record& rec) const {
     // 射线源点
     auto origin = r.m_ori;
     // 射线方向
@@ -134,7 +134,7 @@ bool Rotate_Y::hit(Ray& r, Hit_record& rec) const {
     Ray rotated_r(origin, direction, r.m_time);
 
     // 用旋转变换过的射线与原始物体进行碰撞检测，如果没有碰撞则返回false
-    if (!ptr->hit(rotated_r, rec))
+    if (!ptr->hit(rotated_r, t_min, t_max, rec))
         return false;
 
     // 算出的碰撞点p

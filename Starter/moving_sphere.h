@@ -12,7 +12,7 @@ public:
     MovingSphere(Point3 cen, Point3 cen2, double _time0, double _time1, double r) : m_ori(cen), m_ori_moved(cen2), time0(_time0), time1(_time1),m_r(r) {};
 
     virtual bool hit(
-        Ray& ray, Hit_record& rec) const override;
+        const Ray& ray, double t_min, double t_max, Hit_record& rec) const override;
     Point3 center(double time) const;
 
     virtual bool bounding_box(
@@ -28,7 +28,7 @@ Point3 MovingSphere::center(double time) const {
     return m_ori + ((time - time0) / (time1 - time0)) * (m_ori_moved - m_ori);
 }
 
-bool MovingSphere::hit(Ray& ray, Hit_record& rec) const {
+bool MovingSphere::hit(const Ray& ray, double t_min, double t_max, Hit_record& rec) const {
     Vec3 oc = ray.m_ori - center(ray.m_time);
 
     auto a = dot(ray.m_dir, ray.m_dir);
@@ -42,7 +42,7 @@ bool MovingSphere::hit(Ray& ray, Hit_record& rec) const {
     else {
         rec.t = (-b - sqrt(discriminant)) / (2.0 * a);
 
-        if (rec.t < ray.tMin || ray.tMax < rec.t)
+        if (rec.t < t_min || t_max < rec.t)
             return false;
     }
 

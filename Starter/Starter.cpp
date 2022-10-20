@@ -80,7 +80,7 @@ int main()
     RGBColor bgColor{ .7, .8, 1. };
     CameraFrame cFrame{ {13,2,3},{0,0,0},{0,1,0} };
 
-    switch (8) {
+    switch (7) {
         case 1:
             scene = random_scene();
             break;

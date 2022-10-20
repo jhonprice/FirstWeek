@@ -8,7 +8,7 @@ public:
 	AABB() {}
 	AABB(const Point3& a, const Point3& b) { minP = a; maxP = b; }
 
-	bool hit(const Ray& r) const {
+	bool hit(const Ray& r, double t_min, double t_max) const {
 
 		double t_x0 = (minP.x() - r.m_ori.x()) / r.m_dir.x();
 		double t_x1 = (maxP.x() - r.m_ori.x()) / r.m_dir.x();
@@ -23,13 +23,13 @@ public:
 		double t_z1 = (maxP.z() - r.m_ori.z()) / r.m_dir.z();
 		if (t_z0 > t_z1) std::swap(t_z0, t_z1);
 
-		auto crossPmax = std::min(t_x1, std::min(t_y1, t_z1));
-		auto crossPmin = std::max(t_x0, std::max(t_y0, t_z0));
+		double crossPmax = std::min(t_x1, std::min(t_y1, t_z1));
+		double crossPmin = std::max(t_x0, std::max(t_y0, t_z0));
 
-		auto t_min{ std::max(r.tMin ,crossPmin) };
-		auto t_max{ std::min(r.tMax ,crossPmax) };
+		double r_min{ std::max(t_min ,crossPmin) };
+		double r_max{ std::min(t_max ,crossPmax) };
 
-		return t_min < t_max;
+		return r_min < r_max;
 
 
 

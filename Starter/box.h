@@ -7,7 +7,7 @@ public:
     Box() {}
     Box(const Point3& p0, const Point3& p1, std::shared_ptr<Material> ptr);
 
-    virtual bool hit(Ray& r, Hit_record& rec) const override;
+    virtual bool hit(const Ray& r, double t_min, double t_max, Hit_record& rec) const override;
 
     virtual bool bounding_box(double time0, double time1, AABB& output_box) const override {
         output_box = AABB(box_min, box_max);
@@ -34,6 +34,6 @@ Box::Box(const Point3& p0, const Point3& p1, shared_ptr<Material> ptr) {
     sides.add(std::make_shared<YZ_Rect>(p0.y(), p1.y(), p0.z(), p1.z(), p0.x(), ptr));
 }
 
-bool Box::hit(Ray& r, Hit_record& rec) const {
-    return sides.hit(r, rec);
+bool Box::hit(const Ray& r, double t_min, double t_max, Hit_record& rec) const {
+    return sides.hit(r, t_min, t_max, rec);
 }

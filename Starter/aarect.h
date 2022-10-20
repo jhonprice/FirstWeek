@@ -9,7 +9,7 @@ public:
         std::shared_ptr<Material> mat)
         : x0(_x0), x1(_x1), y0(_y0), y1(_y1), k(_k), mp(mat) {};
 
-    virtual bool hit(Ray& r, Hit_record& rec) const override;
+    virtual bool hit(const Ray& r, double t_min, double t_max, Hit_record& rec) const override;
 
     virtual bool bounding_box(double time0, double time1, AABB& output_box) const override {
         // The bounding box must have non-zero width in each dimension, so pad the Z
@@ -23,9 +23,9 @@ public:
     double x0, x1, y0, y1, k;
 };
 
-bool XY_Rect::hit(Ray& r, Hit_record& rec) const {
+bool XY_Rect::hit(const Ray& r, double t_min, double t_max, Hit_record& rec) const {
     auto t = (k - r.m_ori.z()) / r.m_dir.z();
-    if (t < r.tMin || t > r.tMax)
+    if (t < t_min || t > t_max)
         return false;
     auto x = r.m_ori.x() + t * r.m_dir.x();
     auto y = r.m_ori.y() + t * r.m_dir.y();
@@ -52,7 +52,7 @@ public:
         std::shared_ptr<Material> mat)
         : y0(_y0), y1(_y1), z0(_z0), z1(_z1), k(_k), mp(mat) {};
 
-    virtual bool hit(Ray& r, Hit_record& rec) const override;
+    virtual bool hit(const Ray& r, double t_min, double t_max, Hit_record& rec) const override;
 
     virtual bool bounding_box(double time0, double time1, AABB& output_box) const override {
         // The bounding box must have non-zero width in each dimension, so pad the Z
@@ -66,9 +66,9 @@ public:
     double y0, y1, z0, z1, k;
 };
 
-bool YZ_Rect::hit(Ray& r, Hit_record& rec) const {
+bool YZ_Rect::hit(const Ray& r, double t_min, double t_max, Hit_record& rec) const {
     auto t = (k - r.m_ori.x()) / r.m_dir.x();
-    if (t < r.tMin || t > r.tMax)
+    if (t < t_min || t > t_max)
         return false;
     auto y = r.m_ori.y() + t * r.m_dir.y();
     auto z = r.m_ori.z() + t * r.m_dir.z();
@@ -95,7 +95,7 @@ public:
         std::shared_ptr<Material> mat)
         : x0(_x0), x1(_x1), z0(_z0), z1(_z1), k(_k), mp(mat) {};
 
-    virtual bool hit(Ray& r, Hit_record& rec) const override;
+    virtual bool hit(const Ray& r, double t_min, double t_max, Hit_record& rec) const override;
 
     virtual bool bounding_box(double time0, double time1, AABB& output_box) const override {
         // The bounding box must have non-zero width in each dimension, so pad the Z
@@ -109,9 +109,9 @@ public:
     double x0, x1, z0, z1, k;
 };
 
-bool XZ_Rect::hit(Ray& r, Hit_record& rec) const {
+bool XZ_Rect::hit(const Ray& r, double t_min, double t_max, Hit_record& rec) const {
     auto t = (k - r.m_ori.y()) / r.m_dir.y();
-    if (t < r.tMin || t > r.tMax)
+    if (t < t_min || t > t_max)
         return false;
     auto x = r.m_ori.x() + t * r.m_dir.x();
     auto z = r.m_ori.z() + t * r.m_dir.z();
