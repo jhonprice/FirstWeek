@@ -19,6 +19,7 @@ using namespace std::chrono;
 #include "moving_sphere.h"
 #include "bvh.h"
 #include "aarect.h"
+#include "box.h"
 
 //构建场景
 Scene random_scene();
@@ -33,7 +34,7 @@ Scene cornell_box();
 //初始化最终图像
 Film film{ 600,600,3};
 //Film film{};
-const int samples_per_pixel = 10;
+const int samples_per_pixel = 2;
 const int max_depth = 50;
 float cameraFov = 20.0;
 const double minTime = 0.;
@@ -302,6 +303,22 @@ Scene cornell_box() {
     objects.add(make_shared<XZ_Rect>(0, 555, 0, 555, 0, white));
     objects.add(make_shared<XZ_Rect>(0, 555, 0, 555, 555, white));
     objects.add(make_shared<XY_Rect>(0, 555, 0, 555, 555, white));
+
+
+    //objects.add(std::make_shared<Box>(Point3(130, 0, 65), Point3(295, 165, 230), white));
+    //objects.add(std::make_shared<Box>(Point3(265, 0, 295), Point3(430, 330, 460), white));
+
+
+    std::shared_ptr<Hittable> box1 = std::make_shared<Box>(Point3(0, 0, 0), Point3(165, 330, 165), white);
+    box1 = std::make_shared<Rotate_Y>(box1, 15);
+    box1 = std::make_shared<Translate>(box1, Vec3(265, 0, 295));
+    
+    objects.add(box1);
+
+    std::shared_ptr<Hittable> box2 = std::make_shared<Box>(Point3(0, 0, 0), Point3(165, 165, 165), white);
+    box2 = std::make_shared<Rotate_Y>(box2, -18);
+    box2 = std::make_shared<Translate>(box2, Vec3(130, 0, 65));
+    objects.add(box2);
 
     return objects;
 }
