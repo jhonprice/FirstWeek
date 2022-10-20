@@ -20,6 +20,7 @@ using namespace std::chrono;
 #include "bvh.h"
 #include "aarect.h"
 #include "box.h"
+#include "constant_medium.h"
 
 //构建场景
 Scene random_scene();
@@ -29,10 +30,11 @@ Scene two_perlin_spheres();
 Scene earth();
 Scene simple_light();
 Scene cornell_box();
-
+Scene cornell_smoke();
+Scene final_scene();
 
 //初始化最终图像
-Film film{ 600,600,3};
+Film film{ 800,800,3};
 //Film film{};
 const int samples_per_pixel = 2;
 const int max_depth = 50;
@@ -78,7 +80,7 @@ int main()
     RGBColor bgColor{ .7, .8, 1. };
     CameraFrame cFrame{ {13,2,3},{0,0,0},{0,1,0} };
 
-    switch (6) {
+    switch (8) {
         case 1:
             scene = random_scene();
             break;
@@ -101,6 +103,18 @@ int main()
             cFrame = { {278,278,-800},{278,278,0},{0,1,0} };
             cameraFov = 40.;
             scene = cornell_box();
+            break;
+        case 7:
+            bgColor = RGBColor{ 0,0,0 };
+            cFrame = { {278,278,-800},{278,278,0},{0,1,0} };
+            cameraFov = 40.;
+            scene = cornell_smoke();
+            break;
+        case 8:
+            bgColor = RGBColor{ 0,0,0 };
+            cFrame = { {478, 278, -600},{278, 278, 0},{0,1,0} };
+            cameraFov = 40.;
+            scene = final_scene();
             break;
         default:
             scene = random_scene_test();
@@ -232,7 +246,16 @@ Scene random_scene_test() {
 
     Point3 center(0.9 * random_double(), 0.2, 0.9 * random_double());
     auto center2 = center + Vec3(0, random_double(0, .5), 0);
-    world.add(make_shared<MovingSphere>(center, center2, minTime, maxTime, 0.2, sphere_material));
+    //world.add(make_shared<MovingSphere>(center, center2, minTime, maxTime, 0.2, sphere_material));
+
+
+    
+    auto white = make_shared<Lambertian>(RGBColor(.73, .73, .73));
+    std::shared_ptr<Hittable> box1 = std::make_shared<Box>(Point3(0, 0, 0), Point3(1, 1, 1), white);
+    
+    //world.add(box1);
+    world.add(std::make_shared<Constant_medium>(box1, 0.01, RGBColor(0, 0, 0)));
+
 
     return world;
 }
@@ -323,4 +346,132 @@ Scene cornell_box() {
     return objects;
 }
 
+Scene cornell_smoke() {
+    Scene objects;
 
+    auto red = make_shared<Lambertian>(RGBColor(.65, .05, .05));
+    auto white = make_shared<Lambertian>(RGBColor(.73, .73, .73));
+    auto green = make_shared<Lambertian>(RGBColor(.12, .45, .15));
+    auto light = make_shared<DiffuseLight>(RGBColor(7, 7, 7));
+
+    objects.add(make_shared<YZ_Rect>(0, 555, 0, 555, 555, green));
+    objects.add(make_shared<YZ_Rect>(0, 555, 0, 555, 0, red));
+    objects.add(make_shared<XZ_Rect>(113, 443, 127, 432, 554, light));
+    objects.add(make_shared<XZ_Rect>(0, 555, 0, 555, 0, white));
+    objects.add(make_shared<XZ_Rect>(0, 555, 0, 555, 555, white));
+    objects.add(make_shared<XY_Rect>(0, 555, 0, 555, 555, white));
+
+
+    //objects.add(std::make_shared<Box>(Point3(130, 0, 65), Point3(295, 165, 230), white));
+    //objects.add(std::make_shared<Box>(Point3(265, 0, 295), Point3(430, 330, 460), white));
+
+
+    std::shared_ptr<Hittable> box1 = std::make_shared<Box>(Point3(0, 0, 0), Point3(165, 330, 165), white);
+    box1 = std::make_shared<Rotate_Y>(box1, 15);
+    box1 = std::make_shared<Translate>(box1, Vec3(265, 0, 295));
+
+   
+
+    std::shared_ptr<Hittable> box2 = std::make_shared<Box>(Point3(0, 0, 0), Point3(165, 165, 165), white);
+    box2 = std::make_shared<Rotate_Y>(box2, -18);
+    box2 = std::make_shared<Translate>(box2, Vec3(130, 0, 65));
+
+
+    objects.add(std::make_shared<Constant_medium>(box1, 0.01, RGBColor(0, 0, 0)));
+    objects.add(std::make_shared<Constant_medium>(box2, 0.01, RGBColor(1, 1, 1)));
+
+    return objects;
+}
+
+
+// next week最终测试场景
+Scene final_scene()
+{
+    Scene boxes1;
+    // 地表方块材质：淡绿色纯色纹理
+    auto ground = make_shared<Lambertian>(RGBColor(0.48, 0.83, 0.53));
+
+    // x 和 y方向各20个方块
+    const int boxes_per_side = 20;
+
+    // 对于这20*20个地表方块
+    for (int i = 0; i < boxes_per_side; i++)
+    {
+        for (int j = 0; j < boxes_per_side; j++)
+        {
+            auto w = 100.0;
+            auto x0 = -1000.0 + i * w;
+            auto z0 = -1000.0 + j * w;
+            auto y0 = 0.0;
+            auto x1 = x0 + w;
+            auto y1 = random_double(1, 101);
+            auto z1 = z0 + w;
+
+            // 创建地表方块，并添加到方块列表
+            boxes1.add(make_shared<Box>(Point3(x0, y0, z0), Point3(x1, y1, z1), ground));
+        }
+    }
+
+    Scene objects;
+
+    // 20*20个地表方块使用BVH层次包围体来划分，以便提速
+    objects.add(make_shared<BVH_NODE>(boxes1, 0, 1));
+
+    // 光源材质
+    auto light = make_shared<DiffuseLight>(RGBColor(7, 7, 7));
+    // 在场景上方添加一个矩形光源
+    objects.add(make_shared<XZ_Rect>(123, 423, 147, 412, 554, light));
+
+    // 棕色运动中的球
+    auto center1 = Point3(400, 400, 200);
+    auto center2 = center1 + Vec3(30, 0, 0);
+    auto moving_sphere_material = make_shared<Lambertian>(RGBColor(0.7, 0.3, 0.1));
+    objects.add(make_shared<MovingSphere>(center1, center2, 0, 1, 50, moving_sphere_material));
+
+    // 玻璃球
+    objects.add(make_shared<Sphere>(Point3(260, 150, 45), 50, make_shared<Dielectric>(1.5)));
+
+    // 浅灰色金属球
+    objects.add(make_shared<Sphere>(
+        Point3(0, 150, 145), 50, make_shared<Metal>(RGBColor(0.8, 0.8, 0.9), 1.0)
+        ));
+
+
+    // 蓝色高密度体积球体，它的包围体是一个玻璃球
+    auto boundary = make_shared<Sphere>(Point3(360, 150, 145), 70, make_shared<Dielectric>(1.5));
+    objects.add(boundary);
+    // 包围体里面的体积体的密度比较大，颜色是蓝色
+    objects.add(make_shared<Constant_medium>(boundary, 0.2, RGBColor(0.2, 0.4, 0.9)));
+
+    // 全局白色雾气
+    boundary = make_shared<Sphere>(Point3(0, 0, 0), 5000, make_shared<Dielectric>(1.5));
+    objects.add(make_shared<Constant_medium>(boundary, .0001, RGBColor(1, 1, 1)));
+
+    // 地球模型
+    auto emat = make_shared<Lambertian>(make_shared<ImageTexture>("../image/earthmap.jpg"));
+    objects.add(make_shared<Sphere>(Point3(400, 200, 400), 100, emat));
+
+    // 带噪点的浅灰色金属球
+    auto pertext = make_shared<NoiseTexture>(0.1);
+    objects.add(make_shared<Sphere>(Point3(220, 280, 300), 80, make_shared<Lambertian>(pertext)));
+
+    Scene boxes2;
+    auto white = make_shared<Lambertian>(RGBColor(.73, .73, .73));
+
+    // 1000个随机白色小球组成一个方块
+    int ns = 1000;
+
+    for (int j = 0; j < ns; j++)
+    {
+        boxes2.add(make_shared<Sphere>(Point3::randomVec(0, 165), 10, white));
+    }
+
+    objects.add(make_shared<Translate>(
+        make_shared<Rotate_Y>(
+            make_shared<BVH_NODE>(boxes2, 0.0, 1.0), 15),
+        Vec3(-100, 270, 395)
+        )
+    );
+
+    return objects;
+}
