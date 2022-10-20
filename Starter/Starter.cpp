@@ -24,11 +24,13 @@ Scene random_scene();
 Scene random_scene_test();
 Scene two_spheres_scene();
 Scene two_perlin_spheres();
+Scene earth();
 
 
 //初始化最终图像
-Film film{400,225,3};
-const int samples_per_pixel = 50;
+//Film film{400,225,3};
+Film film{};
+const int samples_per_pixel = 100;
 const int max_depth = 50;
 const float cameraFov = 20.0;
 const double minTime = 0.;
@@ -62,7 +64,7 @@ int main()
 {   
     Scene scene{};
 
-    switch (3) {
+    switch (4) {
         case 1:
             scene = random_scene();
             break;
@@ -71,6 +73,9 @@ int main()
             break;
         case 3:
             scene = two_perlin_spheres();
+            break;
+        case 4:
+            scene = earth();
             break;
         default:
             scene = random_scene_test();
@@ -225,10 +230,21 @@ Scene two_spheres_scene() {
 Scene two_perlin_spheres() {
     Scene objects;
 
-    auto pertext = make_shared<NoiseTextureVec>(4);
+    auto pertext = std::make_shared<NoiseTextureVec>(4);
     objects.add(std::make_shared<Sphere>(Point3(0, -1000, 0), 1000, std::make_shared<Lambertian>(pertext)));
     objects.add(std::make_shared<Sphere>(Point3(0, 2, 0), 2, std::make_shared<Lambertian>(pertext)));
 
     return objects;
 }
+
+
+Scene earth() {
+    auto earth_texture = std::make_shared<ImageTexture>("../image/earthmap.jpg");
+    auto earth_surface = std::make_shared<Lambertian>(earth_texture);
+    auto globe = std::make_shared<Sphere>(Point3(0, 0, 0), 2, earth_surface);
+
+    return Scene(globe);
+}
+
+
 
