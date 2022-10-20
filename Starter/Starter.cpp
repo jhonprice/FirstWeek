@@ -17,6 +17,7 @@ using namespace std::chrono;
 #include "camera.h"
 #include "material.h"
 #include "moving_sphere.h"
+#include "bvh.h"
 
 //构建场景
 Scene random_scene();
@@ -24,15 +25,17 @@ Scene random_scene_test();
 
 
 //初始化最终图像
-Film film{};
-const int samples_per_pixel = 20;
+Film film{400,225,3};
+const int samples_per_pixel = 10;
 const int max_depth = 50;
 const float cameraFov = 20.0;
+const double minTime = 0.;
+const double maxTime = 1.;
 
 const int imageCH = film.imageCH;
 const int imageCW = film.imageCW;
 
-RGBColor ray_color(Ray& r,const Scene& world, int depth) {
+RGBColor ray_color(Ray& r,const Hittable& world, int depth) {
     Hit_record rec{};
 
 
@@ -56,10 +59,9 @@ RGBColor ray_color(Ray& r,const Scene& world, int depth) {
 int main()
 {    
     
-    
-
     // World
-    Scene world{ random_scene_test() };
+    //Scene world{ random_scene() };
+    BVH_NODE world{ { random_scene() } ,minTime ,maxTime };
 
 
 
@@ -127,7 +129,7 @@ Scene random_scene() {
                     sphere_material = make_shared<Lambertian>(albedo);
 
                     auto center2 = center + Vec3(0, random_double(0,.5), 0);
-                    world.add(make_shared<MovingSphere>(center,center2,0.,1.,0.2,sphere_material));
+                    world.add(make_shared<MovingSphere>(center,center2, minTime, maxTime,0.2,sphere_material));
                 }
                 // 如果随机材质浮点数小于0.95，即创建金属材质，即15%的概率 
                 else if (choose_mat < 0.95) {
@@ -178,7 +180,7 @@ Scene random_scene_test() {
 
     Point3 center(0.9 * random_double(), 0.2, 0.9 * random_double());
     auto center2 = center + Vec3(0, random_double(0, .5), 0);
-    world.add(make_shared<MovingSphere>(center, center2, 0., 1., 0.2, sphere_material));
+    world.add(make_shared<MovingSphere>(center, center2, minTime, maxTime, 0.2, sphere_material));
 
     return world;
 }

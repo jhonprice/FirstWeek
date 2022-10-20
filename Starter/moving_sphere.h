@@ -14,6 +14,9 @@ public:
     virtual bool hit(
         Ray& ray, Hit_record& rec) const override;
     Point3 center(double time) const;
+
+    virtual bool bounding_box(
+        double _time0, double _time1, AABB& output_box) const override;
 public:
     Point3 m_ori, m_ori_moved;
     double time0, time1;
@@ -48,5 +51,16 @@ bool MovingSphere::hit(Ray& ray, Hit_record& rec) const {
     rec.set_face_normal(ray, outward_normal);  //…Ë÷√rec.normal
     rec.mat_ptr = mat_ptr; //…Ë÷√≤ƒ÷ 
 
+    return true;
+}
+
+bool MovingSphere::bounding_box(double _time0, double _time1, AABB& output_box) const {
+    AABB box0(
+        center(_time0) - Vec3(m_r, m_r, m_r),
+        center(_time0) + Vec3(m_r, m_r, m_r));
+    AABB box1(
+        center(_time1) - Vec3(m_r, m_r, m_r),
+        center(_time1) + Vec3(m_r, m_r, m_r));
+    output_box = surrounding_box(box0, box1);
     return true;
 }

@@ -12,6 +12,7 @@ public:
 
     virtual bool hit(
         Ray& ray, Hit_record& rec) const override;
+    virtual bool bounding_box(double time0, double time1, AABB& output_box) const override;
 
 public:
     Point3 m_ori;
@@ -41,5 +42,12 @@ bool Sphere::hit(Ray& ray, Hit_record& rec) const {
     rec.set_face_normal(ray, (rec.p - m_ori) / m_r);  //…Ë÷√rec.normal
     rec.mat_ptr = mat_ptr; //…Ë÷√≤ƒ÷ 
 
+    return true;
+}
+
+bool Sphere::bounding_box(double time0, double time1, AABB& output_box) const {
+    output_box = AABB(
+        m_ori - Vec3(m_r, m_r, m_r),
+        m_ori + Vec3(m_r, m_r, m_r));
     return true;
 }

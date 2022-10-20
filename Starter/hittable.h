@@ -1,6 +1,6 @@
 #pragma once
 #include "ray.h"
-
+#include "aabb.h"
 class Material;
 
 //记录交点信息和材质
@@ -21,5 +21,6 @@ struct Hit_record {
 class Hittable {
 public:
     virtual bool hit(Ray& r, Hit_record& rec) const = 0;
+    virtual bool bounding_box(double time0, double time1, AABB& output_box) const = 0;
 };
 using Shape = Hittable;
