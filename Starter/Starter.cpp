@@ -18,6 +18,7 @@ using namespace std::chrono;
 #include "material.h"
 #include "moving_sphere.h"
 #include "bvh.h"
+#include "aarect.h"
 
 //构建场景
 Scene random_scene();
@@ -25,21 +26,22 @@ Scene random_scene_test();
 Scene two_spheres_scene();
 Scene two_perlin_spheres();
 Scene earth();
+Scene simple_light();
+Scene cornell_box();
 
 
 //初始化最终图像
-//Film film{400,225,3};
-Film film{};
-const int samples_per_pixel = 100;
+Film film{ 600,600,3};
+//Film film{};
+const int samples_per_pixel = 200;
 const int max_depth = 50;
 const float cameraFov = 20.0;
 const double minTime = 0.;
 const double maxTime = 1.;
 
-const int imageCH = film.imageCH;
-const int imageCW = film.imageCW;
 
-RGBColor ray_color(Ray& r,const Hittable& world, int depth) {
+
+RGBColor ray_color(Ray& r,const Hittable& world, int depth, RGBColor bgColor) {
     Hit_record rec{};
 
 
@@ -50,21 +52,32 @@ RGBColor ray_color(Ray& r,const Hittable& world, int depth) {
         
         Ray scattered{};
         RGBColor attenuation{};
-        if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
-            return attenuation * ray_color(scattered, world, depth - 1);
-        return RGBColor(0, 0, 0);
+        RGBColor emitted = rec.mat_ptr->emitted(rec.uv.first, rec.uv.second, rec.p);
+
+        if (rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
+            return emitted + attenuation * ray_color(scattered, world, depth - 1, bgColor);
+        }
+        else {
+            return emitted;
+        }
+    }
+    else {
+        //Vec3 unit_direction = unit_vector(r.m_dir);
+        //auto t = 0.5 * (unit_direction.y() + 1.0);
+        //return (1.0 - t) * RGBColor(1.0, 1.0, 1.0) + t * RGBColor(0.5, 0.7, 1.0);
+        return bgColor;
     }
 
-    Vec3 unit_direction = unit_vector(r.m_dir);
-    auto t = 0.5 * (unit_direction.y() + 1.0);
-    return (1.0 - t) * RGBColor(1.0, 1.0, 1.0) + t * RGBColor(0.5, 0.7, 1.0);
+    
 }
 
 int main()
 {   
     Scene scene{};
+    RGBColor bgColor{ .7, .8, 1. };
+    CameraFrame cFrame{ {13,2,3},{0,0,0},{0,1,0} };
 
-    switch (4) {
+    switch (6) {
         case 1:
             scene = random_scene();
             break;
@@ -77,6 +90,16 @@ int main()
         case 4:
             scene = earth();
             break;
+        case 5:
+            bgColor = RGBColor{ 0,0,0 };
+            cFrame = { {26,3,6},{0,2,0},{0,1,0} };
+            scene = simple_light();
+            break;
+        case 6:
+            bgColor = RGBColor{ 0,0,0 };
+            cFrame = { {278,278,-800},{278,278,0},{0,1,0} };
+            scene = cornell_box();
+            break;
         default:
             scene = random_scene_test();
             break;
@@ -84,13 +107,16 @@ int main()
 
     
     // World
-    //Scene world{ random_scene() };
-    BVH_NODE world{ { scene } ,minTime ,maxTime };
+    Scene world{ scene };
+    //BVH_NODE world{ { scene } ,minTime ,maxTime };
 
 
     //Camera camera{ {{-2,2,1},{0,0,-1},{0,1,0}}, cameraFov, film.getAspectRadio() };
-    RealCamera camera{{{13,2,3},{0,0,0},{0,1,0}}, cameraFov, film.getAspectRadio(),0.,1.};
+    RealCamera camera{ cFrame, cameraFov, film.getAspectRadio(),0.,1.};
 
+
+    const int imageCH = film.imageCH;
+    const int imageCW = film.imageCW;
     //渲染循环
     auto start = system_clock::now();
     for (int y{ 0 }; y < imageCH; ++y) {
@@ -102,7 +128,7 @@ int main()
                 auto u = double(x + random_double()) / (imageCW - 1);
                 auto v = double(y + random_double()) / (imageCH - 1);
                 Ray r{ camera.get_ray(u,v) };
-                pixel_color += ray_color(r, world, max_depth);
+                pixel_color += ray_color(r, world, max_depth, bgColor);
             }
 
             film.setPixWithGamma(y, x, pixel_color, samples_per_pixel);
@@ -246,5 +272,37 @@ Scene earth() {
     return Scene(globe);
 }
 
+
+Scene simple_light() {
+    Scene objects;
+
+    auto pertext = std::make_shared<NoiseTextureVec>(4);
+    objects.add(std::make_shared<Sphere>(Point3(0, -1000, 0), 1000, std::make_shared<Lambertian>(pertext)));
+    objects.add(std::make_shared<Sphere>(Point3(0, 2, 0), 2, std::make_shared<Lambertian>(pertext)));
+
+    // 光源材质，注意这里的光源色大于(1,1,1)的白色，因为它要把周围照亮
+    auto difflight = std::make_shared<DiffuseLight>(RGBColor(4, 4, 4));
+    objects.add(std::make_shared<XY_Rect>(3, 5, 1, 3, -2, difflight));
+
+    return objects;
+}
+
+Scene cornell_box() {
+    Scene objects;
+
+    auto red = make_shared<Lambertian>(RGBColor(.65, .05, .05));
+    auto white = make_shared<Lambertian>(RGBColor(.73, .73, .73));
+    auto green = make_shared<Lambertian>(RGBColor(.12, .45, .15));
+    auto light = make_shared<DiffuseLight>(RGBColor(15, 15, 15));
+
+    objects.add(make_shared<YZ_Rect>(0, 555, 0, 555, 555, green));
+    objects.add(make_shared<YZ_Rect>(0, 555, 0, 555, 0, red));
+    objects.add(make_shared<XZ_Rect>(213, 343, 227, 332, 554, light));
+    objects.add(make_shared<XZ_Rect>(0, 555, 0, 555, 0, white));
+    objects.add(make_shared<XZ_Rect>(0, 555, 0, 555, 555, white));
+    objects.add(make_shared<XY_Rect>(0, 555, 0, 555, 555, white));
+
+    return objects;
+}
 
 
