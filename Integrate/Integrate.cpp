@@ -23,7 +23,7 @@ void sample1() {
 
 
 //作用1：pdf，2:非均匀采样的平均权重
-inline double pdf(double x) {
+inline double pdf_func(double x) {
     return 0.5 * x;
 }
 //非均匀采样
@@ -34,7 +34,8 @@ void sample2() {
     // 数学推导注意：注意理解其中的数学逻辑（见book
     for (int i = 0; i < N; i++) {
         auto x = sqrt(random_double(0, 4));
-        sum += x * x / pdf(x);
+        auto f_x = x * x;
+        sum += f_x / pdf_func(x);
     }
     std::cout << std::fixed << std::setprecision(12);
     // 通过一百万个点的高度和 除以 采样次数 即算出平均数，在乘以长度2，即算出面积了
@@ -42,7 +43,7 @@ void sample2() {
 }
 
 
-inline double pdf2(double x) {
+inline double pdf_const(double x) {
     return 0.5;
 }
 
@@ -51,14 +52,15 @@ void sample3() {
     auto sum = 0.0;
     for (int i = 0; i < N; i++) {
         auto x = random_double(0, 2);
-        sum += x * x / pdf2(x);
+        auto f_x = x * x;
+        sum += f_x / pdf_const(x);
     }
     std::cout << std::fixed << std::setprecision(12);
     std::cout << "I = " << sum / N << '\n';
 }
 
 
-inline double pdf3(double x) {
+inline double pdf_perfect(double x) {
     return 3 * x * x / 8;
 }
 
@@ -67,7 +69,8 @@ void sample4() {
     auto sum = 0.0;
     for (int i = 0; i < N; i++) {
         auto x = pow(random_double(0, 8), 1. / 3.);
-        sum += x * x / pdf3(x);
+        auto f_x = x * x;
+        sum += f_x / pdf_perfect(x);
     }
     std::cout << std::fixed << std::setprecision(12);
     std::cout << "I = " << sum / N << '\n';
@@ -75,5 +78,9 @@ void sample4() {
 
 int main()
 {
+    std::cout << "right: "<< 8./3.<< std::endl;
+    sample1();
+    sample2();
+    sample3();
     sample4();
 }
