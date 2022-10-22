@@ -68,8 +68,9 @@ public:
         double aspect_ratio,
         double time0 = 0,
         double time1 = 0,
-        double lenLength=0.1) {
-        auto focusTodistLength = frame.dist_to_focus();
+        double lenLength=0.1,double f2L = -1) {
+
+        auto focusTodistLength = f2L<0?frame.dist_to_focus():f2L;
 
         auto theta = degrees_to_radians(vfov);
         auto h = tan(theta / 2);
