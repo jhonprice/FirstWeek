@@ -29,7 +29,7 @@ Scene cornell_box();
 //初始化最终图像
 Film film{ 500,500,3};
 //Film film{};
-const int samples_per_pixel = 100;
+const int samples_per_pixel = 10;
 const int max_depth = 50;
 float cameraFov = 40.0;
 const double minTime = 0.;
@@ -48,12 +48,35 @@ RGBColor ray_color(Ray& r,const Hittable& world, int depth, RGBColor bgColor) {
         
         Ray scattered{};
         //RGBColor attenuation{};
-        RGBColor emitted = rec.mat_ptr->emitted(rec.uv.first, rec.uv.second, rec.p);
+        RGBColor emitted = rec.mat_ptr->emitted(r,rec,rec.uv.first, rec.uv.second, rec.p);
 
         double pdf;
         RGBColor albedo;
 
         if (rec.mat_ptr->scatter(r, rec, albedo, scattered, pdf)) {
+
+            //scattered = Ray(rec.p, unit_vector(scatter_direction), r_in.m_time);
+            //pdf = dot(rec.normal, scattered.m_dir) / pi; //点乘求cos
+            
+            //光采样
+            {
+                //objects.add(make_shared<XZ_Rect>(213, 343, 227, 332, 554, light));
+                auto on_light = Point3(random_double(213, 343), 554, random_double(227, 332));
+                auto to_light = on_light - rec.p;
+                auto distance_squared = to_light.length_squared();
+                to_light = unit_vector(to_light);
+
+                if (dot(to_light, rec.normal) < 0)
+                    return emitted;
+
+                double light_area = (343 - 213) * (332 - 227);
+                auto light_cosine = std::abs(to_light.y());
+                if (light_cosine < 0.000001)
+                    return emitted;
+
+                pdf = distance_squared / (light_cosine * light_area);
+                scattered = Ray(rec.p, to_light, r.m_time);
+            }
             return emitted
                 + albedo * rec.mat_ptr->scatter_pdf(r, rec, scattered)
                 * ray_color(scattered ,world, depth - 1, bgColor) / pdf;
@@ -135,7 +158,8 @@ Scene cornell_box() {
 
     objects.add(make_shared<YZ_Rect>(0, 555, 0, 555, 555, green));
     objects.add(make_shared<YZ_Rect>(0, 555, 0, 555, 0, red));
-    objects.add(make_shared<XZ_Rect>(213, 343, 227, 332, 554, light));
+    //objects.add(make_shared<XZ_Rect>(213, 343, 227, 332, 554, light));
+    objects.add(make_shared<Flip_face>(std::make_shared<XZ_Rect>(213, 343, 227, 332, 554, light)));
     objects.add(make_shared<XZ_Rect>(0, 555, 0, 555, 0, white));
     objects.add(make_shared<XZ_Rect>(0, 555, 0, 555, 555, white));
     objects.add(make_shared<XY_Rect>(0, 555, 0, 555, 555, white));

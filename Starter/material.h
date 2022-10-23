@@ -2,6 +2,7 @@
 #include "hittable.h"
 #include "ray.h"
 #include "texture.h"
+#include "onb.h"
 
 class Material {
 public:
@@ -18,7 +19,7 @@ public:
     }
 
 
-    virtual RGBColor emitted(double u, double v, const Point3& p) const  {
+    virtual RGBColor emitted(const Ray& r_in, const Hit_record& rec, double u, double v, const Point3& p) const  {
         return RGBColor(0, 0, 0);
     }
 };
@@ -34,12 +35,9 @@ public:
         const Ray& r_in, const Hit_record& rec, RGBColor& attenuation, Ray& scattered, double& pdf
     ) const override {
 
-        Vec3 scatter_direction = rec.normal + random_unit_vector();
-
-
-        // Catch degenerate scatter direction
-        if (scatter_direction.near_zero())
-            scatter_direction = rec.normal;
+        ONB uvw;
+        uvw.build_from_w(rec.normal);
+        auto scatter_direction = uvw.local(random_cosine_direction());
 
 
         scattered = Ray(rec.p, unit_vector(scatter_direction), r_in.m_time);
@@ -79,8 +77,12 @@ public:
     DiffuseLight(RGBColor c) : emit(std::make_shared<SolidColor>(c)) {}
 
 
-    virtual RGBColor emitted(double u, double v, const Point3& p) const override {
-        return emit->value(u, v, p);
+    virtual RGBColor emitted(const Ray& r_in, const Hit_record& rec, double u, double v, const Point3& p) const override {
+        
+        if (rec.front_face)
+            return emit->value(u, v, p);
+        else
+            return RGBColor(0, 0, 0);
     }
 
 public:
