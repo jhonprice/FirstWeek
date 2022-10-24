@@ -21,6 +21,7 @@ using namespace std::chrono;
 #include "aarect.h"
 #include "box.h"
 #include "constant_medium.h"
+#include "pdf.h"
 
 //构建场景
 Scene cornell_box();
@@ -37,7 +38,7 @@ const double maxTime = 1.;
 
 
 
-RGBColor ray_color(Ray& r,const Hittable& world, int depth, RGBColor bgColor) {
+RGBColor ray_color(Ray& r,const Hittable& world, int depth, RGBColor bgColor,std::shared_ptr<Hittable>& lights) {
     Hit_record rec{};
 
 
@@ -61,7 +62,7 @@ RGBColor ray_color(Ray& r,const Hittable& world, int depth, RGBColor bgColor) {
             //光采样
             {
                 //objects.add(make_shared<XZ_Rect>(213, 343, 227, 332, 554, light));
-                auto on_light = Point3(random_double(213, 343), 554, random_double(227, 332));
+                /*auto on_light = Point3(random_double(213, 343), 554, random_double(227, 332));
                 auto to_light = on_light - rec.p;
                 auto distance_squared = to_light.length_squared();
                 to_light = unit_vector(to_light);
@@ -75,11 +76,31 @@ RGBColor ray_color(Ray& r,const Hittable& world, int depth, RGBColor bgColor) {
                     return emitted;
 
                 pdf = distance_squared / (light_cosine * light_area);
-                scattered = Ray(rec.p, to_light, r.m_time);
+                scattered = Ray(rec.p, to_light, r.m_time);*/
+
+                //2. 光采样pdf形式
+                /*Hittable_pdf light_pdf(lights, rec.p);
+                scattered = Ray(rec.p, light_pdf.generate(), r.m_time);
+                pdf = light_pdf.value(scattered.m_dir);*/
+            }
+            {
+                //1. cos pdf形式
+                /*Cosine_pdf p(rec.normal);
+                scattered = Ray(rec.p, p.generate(), r.m_time);
+                pdf = p.value(scattered.m_dir);*/
+
+
+                //1, 2混合
+                auto p0 = make_shared<Hittable_pdf>(lights, rec.p);
+                auto p1 = make_shared<Cosine_pdf>(rec.normal);
+                Mixture_pdf mixed_pdf(p0, p1);
+
+                scattered = Ray(rec.p, mixed_pdf.generate(), r.m_time);
+                pdf = mixed_pdf.value(scattered.m_dir);
             }
             return emitted
                 + albedo * rec.mat_ptr->scatter_pdf(r, rec, scattered)
-                * ray_color(scattered ,world, depth - 1, bgColor) / pdf;
+                * ray_color(scattered ,world, depth - 1, bgColor, lights) / pdf;
             //return emitted + attenuation * ray_color(scattered, world, depth - 1, bgColor);
         }
         else {
@@ -109,6 +130,8 @@ int main()
     // World
     Scene world{ scene };
     //BVH_NODE world{ { scene } ,minTime ,maxTime };
+    std::shared_ptr<Hittable> lights =
+        std::make_shared<XZ_Rect>(213, 343, 227, 332, 554, std::shared_ptr<Material>());
 
 
     //Camera camera{ {{-2,2,1},{0,0,-1},{0,1,0}}, cameraFov, film.getAspectRadio() };
@@ -128,7 +151,7 @@ int main()
                 auto u = double(x + random_double()) / (imageCW - 1);
                 auto v = double(y + random_double()) / (imageCH - 1);
                 Ray r{ camera.get_ray(u,v) };
-                pixel_color += ray_color(r, world, max_depth, bgColor);
+                pixel_color += ray_color(r, world, max_depth, bgColor, lights);
             }
 
             film.setPixWithGamma(y, x, pixel_color, samples_per_pixel);

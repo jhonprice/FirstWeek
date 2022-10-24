@@ -103,6 +103,22 @@ public:
         output_box = AABB(Point3(x0, z0, k - 0.0001), Point3(x1, z1, k + 0.0001));
         return true;
     }
+    virtual double pdf_value(const Point3& origin, const Vec3& v) const override {
+        Hit_record rec;
+        if (!this->hit(Ray(origin, v), 0.001, infinity, rec))
+            return 0;
+
+        auto area = (x1 - x0) * (z1 - z0);
+        auto distance_squared = rec.t * rec.t * v.length_squared();
+        auto cosine = std::abs(dot(v, rec.normal) / v.length());
+
+        return distance_squared / (cosine * area);
+    }
+
+    virtual Vec3 random(const Point3& origin) const override {
+        auto random_point = Point3(random_double(x0, x1), k, random_double(z0, z1));
+        return random_point - origin;
+    }
 
 public:
     std::shared_ptr<Material> mp;
