@@ -29,7 +29,7 @@ public:
 
 class Hittable_pdf : public pdf {
 public:
-    Hittable_pdf(shared_ptr<Hittable> p, const Point3& origin) : ptr(p), o(origin) {}
+    Hittable_pdf(std::shared_ptr<Hittable> p, const Point3& origin) : ptr(p), o(origin) {}
 
     virtual double value(const Vec3& direction) const override {
         return ptr->pdf_value(o, direction);
@@ -65,3 +65,15 @@ public:
 public:
     std::shared_ptr<pdf> p[2];
 };
+
+inline Vec3 random_to_sphere(double radius, double distance_squared) {
+    auto r1 = random_double();
+    auto r2 = random_double();
+    auto z = 1 + r2 * (sqrt(1 - radius * radius / distance_squared) - 1);
+
+    auto phi = 2 * pi * r1;
+    auto x = cos(phi) * sqrt(1 - z * z);
+    auto y = sin(phi) * sqrt(1 - z * z);
+
+    return Vec3(x, y, z);
+}

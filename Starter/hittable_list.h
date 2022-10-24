@@ -17,6 +17,8 @@ public:
 
     virtual bool hit(const Ray& r, double t_min, double t_max, Hit_record& rec) const override;
     virtual bool bounding_box(double time0, double time1, AABB& output_box) const override;
+    virtual double pdf_value(const Point3& o, const Vec3& v) const override;
+    virtual Vec3 random(const Vec3& o) const override;
 
 public:
     std::vector<shared_ptr<Hittable>> objects;
@@ -55,3 +57,19 @@ bool Hittable_list::bounding_box(double time0, double time1, AABB& output_box) c
 }
 
 using Scene = Hittable_list;
+
+
+double Hittable_list::pdf_value(const Point3& o, const Vec3& v) const {
+    auto weight = 1.0 / objects.size();
+    auto sum = 0.0;
+
+    for (const auto& object : objects)
+        sum += weight * object->pdf_value(o, v);
+
+    return sum;
+}
+
+Vec3 Hittable_list::random(const Vec3& o) const {
+    auto int_size = static_cast<int>(objects.size());
+    return objects[random_int(0, int_size - 1)]->random(o);
+}

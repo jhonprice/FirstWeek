@@ -2,6 +2,8 @@
 #include "hittable.h"
 #include "vec3.h"
 #include "ray.h"
+#include "onb.h"
+#include "pdf.h"
 
 class Sphere : public Shape {
 public:
@@ -12,6 +14,8 @@ public:
 
     virtual bool hit(const Ray& ray, double t_min, double t_max, Hit_record& rec) const override;
     virtual bool bounding_box(double time0, double time1, AABB& output_box) const override;
+    virtual double pdf_value(const Point3& o, const Vec3& v) const override;
+    virtual Vec3 random(const Vec3& o) const override;
 
     static void get_sphere_uv(const Point3& p, double& u, double& v) {
         // p: a given point on the sphere of radius one, centered at the origin.
@@ -68,4 +72,25 @@ bool Sphere::bounding_box(double time0, double time1, AABB& output_box) const {
         m_ori - Vec3(m_r, m_r, m_r),
         m_ori + Vec3(m_r, m_r, m_r));
     return true;
+}
+
+
+double Sphere::pdf_value(const Point3& o, const Vec3& v) const {
+    Hit_record rec;
+    if (!this->hit(Ray(o, v), 0.001, infinity, rec))
+        return 0;
+
+    auto cos_theta_max = sqrt(1 - m_r * m_r / (m_ori - o).length_squared());
+    auto solid_angle = 2 * pi * (1 - cos_theta_max);
+
+    return  1 / solid_angle;
+}
+
+inline Vec3 Sphere::random(const Vec3& o) const
+{
+    Vec3 direction = m_ori - o;
+    auto distance_squared = direction.length_squared();
+    ONB uvw;
+    uvw.build_from_w(direction);
+    return uvw.local(random_to_sphere(m_r, distance_squared));
 }

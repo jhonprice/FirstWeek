@@ -30,7 +30,7 @@ Scene cornell_box();
 //初始化最终图像
 Film film{ 500,500,3};
 //Film film{};
-const int samples_per_pixel = 10;
+const int samples_per_pixel = 1000;
 const int max_depth = 50;
 float cameraFov = 40.0;
 const double minTime = 0.;
@@ -38,7 +38,7 @@ const double maxTime = 1.;
 
 
 
-RGBColor ray_color(Ray& r,const Hittable& world, int depth, RGBColor bgColor,std::shared_ptr<Hittable>& lights) {
+RGBColor ray_color(const Ray& r,const Hittable& world, int depth, const RGBColor bgColor,std::shared_ptr<Hittable> lights) {
     Hit_record rec{};
 
 
@@ -46,71 +46,32 @@ RGBColor ray_color(Ray& r,const Hittable& world, int depth, RGBColor bgColor,std
         return RGBColor(0, 0, 0);
 
     if (world.hit(r, 0.001, infinity,rec)) {
-        
-        Ray scattered{};
-        //RGBColor attenuation{};
-        RGBColor emitted = rec.mat_ptr->emitted(r,rec,rec.uv.first, rec.uv.second, rec.p);
 
-        double pdf;
-        RGBColor albedo;
+        Scatter_record srec;
+        RGBColor emitted = rec.mat_ptr->emitted(r, rec, rec.uv.first, rec.uv.second, rec.p);
+        if (rec.mat_ptr->scatter(r, rec, srec)) {
 
-        if (rec.mat_ptr->scatter(r, rec, albedo, scattered, pdf)) {
-
-            //scattered = Ray(rec.p, unit_vector(scatter_direction), r_in.m_time);
-            //pdf = dot(rec.normal, scattered.m_dir) / pi; //点乘求cos
-            
-            //光采样
-            {
-                //objects.add(make_shared<XZ_Rect>(213, 343, 227, 332, 554, light));
-                /*auto on_light = Point3(random_double(213, 343), 554, random_double(227, 332));
-                auto to_light = on_light - rec.p;
-                auto distance_squared = to_light.length_squared();
-                to_light = unit_vector(to_light);
-
-                if (dot(to_light, rec.normal) < 0)
-                    return emitted;
-
-                double light_area = (343 - 213) * (332 - 227);
-                auto light_cosine = std::abs(to_light.y());
-                if (light_cosine < 0.000001)
-                    return emitted;
-
-                pdf = distance_squared / (light_cosine * light_area);
-                scattered = Ray(rec.p, to_light, r.m_time);*/
-
-                //2. 光采样pdf形式
-                /*Hittable_pdf light_pdf(lights, rec.p);
-                scattered = Ray(rec.p, light_pdf.generate(), r.m_time);
-                pdf = light_pdf.value(scattered.m_dir);*/
+            if (srec.is_specular) {
+                return srec.attenuation
+                    * ray_color(srec.specular_ray, world, depth - 1,bgColor, lights);
             }
-            {
-                //1. cos pdf形式
-                /*Cosine_pdf p(rec.normal);
-                scattered = Ray(rec.p, p.generate(), r.m_time);
-                pdf = p.value(scattered.m_dir);*/
 
+            auto light_ptr = std::make_shared<Hittable_pdf>(lights, rec.p);
+            Mixture_pdf p(light_ptr, srec.pdf_ptr);
 
-                //1, 2混合
-                auto p0 = make_shared<Hittable_pdf>(lights, rec.p);
-                auto p1 = make_shared<Cosine_pdf>(rec.normal);
-                Mixture_pdf mixed_pdf(p0, p1);
+            Ray scattered = Ray(rec.p, p.generate(), r.m_time);
+            auto pdf_val = p.value(scattered.m_dir);
 
-                scattered = Ray(rec.p, mixed_pdf.generate(), r.m_time);
-                pdf = mixed_pdf.value(scattered.m_dir);
-            }
             return emitted
-                + albedo * rec.mat_ptr->scatter_pdf(r, rec, scattered)
-                * ray_color(scattered ,world, depth - 1, bgColor, lights) / pdf;
-            //return emitted + attenuation * ray_color(scattered, world, depth - 1, bgColor);
+                + srec.attenuation * rec.mat_ptr->scatter_pdf(r, rec, scattered)
+                * ray_color(scattered ,world, depth - 1, bgColor, lights) / pdf_val;
         }
         else {
             return emitted;
         }
     }
     else {
-        //Vec3 unit_direction = unit_vector(r.m_dir);
-        //auto t = 0.5 * (unit_direction.y() + 1.0);
-        //return (1.0 - t) * RGBColor(1.0, 1.0, 1.0) + t * RGBColor(0.5, 0.7, 1.0);
+
         return bgColor;
     }
 
@@ -130,8 +91,10 @@ int main()
     // World
     Scene world{ scene };
     //BVH_NODE world{ { scene } ,minTime ,maxTime };
-    std::shared_ptr<Hittable> lights =
-        std::make_shared<XZ_Rect>(213, 343, 227, 332, 554, std::shared_ptr<Material>());
+    auto lights = make_shared<Hittable_list>();
+    
+    lights->add(make_shared<XZ_Rect>(213, 343, 227, 332, 554, shared_ptr<Material>()));
+    lights->add(make_shared<Sphere>(Point3(190, 90, 190), 90, shared_ptr<Material>()));
 
 
     //Camera camera{ {{-2,2,1},{0,0,-1},{0,1,0}}, cameraFov, film.getAspectRadio() };
@@ -181,27 +144,23 @@ Scene cornell_box() {
 
     objects.add(make_shared<YZ_Rect>(0, 555, 0, 555, 555, green));
     objects.add(make_shared<YZ_Rect>(0, 555, 0, 555, 0, red));
-    //objects.add(make_shared<XZ_Rect>(213, 343, 227, 332, 554, light));
     objects.add(make_shared<Flip_face>(std::make_shared<XZ_Rect>(213, 343, 227, 332, 554, light)));
     objects.add(make_shared<XZ_Rect>(0, 555, 0, 555, 0, white));
     objects.add(make_shared<XZ_Rect>(0, 555, 0, 555, 555, white));
     objects.add(make_shared<XY_Rect>(0, 555, 0, 555, 555, white));
 
 
-    //objects.add(std::make_shared<Box>(Point3(130, 0, 65), Point3(295, 165, 230), white));
-    //objects.add(std::make_shared<Box>(Point3(265, 0, 295), Point3(430, 330, 460), white));
 
 
+    shared_ptr<Material> aluminum = make_shared<Metal>(RGBColor(0.8, 0.85, 0.88), 0.0);
     std::shared_ptr<Hittable> box1 = std::make_shared<Box>(Point3(0, 0, 0), Point3(165, 330, 165), white);
     box1 = std::make_shared<Rotate_Y>(box1, 15);
     box1 = std::make_shared<Translate>(box1, Vec3(265, 0, 295));
     
     objects.add(box1);
 
-    std::shared_ptr<Hittable> box2 = std::make_shared<Box>(Point3(0, 0, 0), Point3(165, 165, 165), white);
-    box2 = std::make_shared<Rotate_Y>(box2, -18);
-    box2 = std::make_shared<Translate>(box2, Vec3(130, 0, 65));
-    objects.add(box2);
+    auto glass = make_shared<Dielectric>(1.5);
+    objects.add(make_shared<Sphere>(Point3(190, 90, 190), 90, glass));
 
     return objects;
 }

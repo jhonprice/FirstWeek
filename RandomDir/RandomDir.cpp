@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "../Starter/math_helper.h"
+#include "..\Starter\vec3.h"
 
 
 void random_sphere() {

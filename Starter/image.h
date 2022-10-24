@@ -60,7 +60,18 @@ void Film::setPix(int x, int y, RGBColor color, int samples_per_pixel) {
 void Film::setPixWithGamma(int x, int y, RGBColor color, int samples_per_pixel) {
 
     auto scale = 1.0 / samples_per_pixel;
-    RGBColor tmpRGB{ sqrt(color.x() * scale),sqrt(color.y() * scale), sqrt(color.z() * scale)};
+
+
+    auto r = color.x();
+    auto g = color.y();
+    auto b = color.z();
+
+    // Replace NaN components with zero. See explanation in Ray Tracing: The Rest of Your Life.
+    if (r != r) r = 0.0;
+    if (g != g) g = 0.0;
+    if (b != b) b = 0.0;
+
+    RGBColor tmpRGB{ sqrt(r * scale),sqrt(g * scale), sqrt(b * scale)};
 
 
     result[(x * imageCW + y) * 3 + 0] = static_cast<int>(256 * clamp(tmpRGB.x(), 0.0, 0.999));
